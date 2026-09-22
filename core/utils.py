@@ -5,5 +5,4 @@ def get_window_dimension() -> QSize:
 	screen = QGuiApplication.primaryScreen()
 	width = screen.size().width() // 3
 	height = width // 2
-	print(width, height)
 	return QSize(width, height)
