@@ -8,6 +8,10 @@ class RSAPMainWindow(QMainWindow):
 	def __init__(self):
 		super().__init__()
 
+		self.setWindowFlag(Qt.WindowStaysOnTopHint)
+		self.hide()
+		self.show()
+
 		self.setWindowTitle('RSAP')
 		self.setFixedSize(get_window_dimension())
 
@@ -21,7 +25,7 @@ class RSAPMainWindow(QMainWindow):
 
 		self.number_label = QLabel('??', self)
 		self.number_label.setFont(QFont('Consolas', self.height() // 2))
-		self.number_label.setStyleSheet('color: #0094FF')
+		self.number_label.setStyleSheet('color: #0094FF; font-weight: bold;')
 		self.nn_layout.addWidget(self.number_label, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
 		
 		self.name_label = QLabel('啊阿来', self)
