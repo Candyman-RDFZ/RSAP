@@ -6,7 +6,7 @@ from core.config import DIR_ROOT
 
 def get_window_dimension() -> QSize:
 	screen = QGuiApplication.primaryScreen()
-	width = screen.size().width() * 2 // 5
+	width = screen.size().width() * 1 // 3
 	height = width // 2
 	return QSize(width, height)
 
