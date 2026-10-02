@@ -1,5 +1,8 @@
 from PySide6.QtCore import QSize
 from PySide6.QtGui import QGuiApplication
+import pathlib
+
+from core.config import DIR_ROOT
 
 def get_window_dimension() -> QSize:
 	screen = QGuiApplication.primaryScreen()
@@ -16,5 +19,8 @@ def get_hidewnd_dimension() -> QSize:
 
 def get_hidewnd_pos(wnd_w: int, wnd_h: int) -> tuple:
 	screen = QGuiApplication.primaryScreen()
-	geom = screen.geometry()
+	geom = screen.availableGeometry()
 	return (geom.x() + geom.width() - wnd_w, geom.y() + geom.height() - wnd_h)
+
+def sanitize_path(path: str) -> str:
+	return str(pathlib.Path(DIR_ROOT) / path)

@@ -9,7 +9,6 @@ class RSAPHiddenWnd(QPushButton):
 		self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
 		self.setFixedSize(get_hidewnd_dimension())
 		pos = get_hidewnd_pos(self.width(), self.height())
-		print(pos)
 		self.move(pos[0], pos[1])
 
 		self.mainwnd = parent

@@ -15,7 +15,7 @@ class RSAPMainWindow(QMainWindow):
 
 		self.setWindowTitle('RSAP')
 		self.resize(get_window_dimension())
-		self.setFixedSize(get_window_dimension())
+#		self.setFixedSize(get_window_dimension())
 		self.setup_ui()
 
 	def setup_ui(self):
