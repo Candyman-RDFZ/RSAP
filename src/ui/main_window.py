@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QL
 from core.utils import get_window_dimension
 from core.config import PLATFORM
 from ui.hidden_wnd import RSAPHiddenWnd
+from core.rand_engine import RandomEngine
 
 import logging
 
@@ -13,6 +14,8 @@ lgr = logging.getLogger(__name__)
 class RSAPMainWindow(QMainWindow):
 	def __init__(self):
 		super().__init__()
+		self.random_engine = RandomEngine(self)
+
 		lgr.info('Main window initiated')
 		if PLATFORM == 'Linux':
 			lgr.warning('Running on Linux. Some window features, such as stay on top, may not function correctly')
@@ -50,8 +53,7 @@ class RSAPMainWindow(QMainWindow):
 		tmp_font.setPointSize(self.height() // 6)
 		self.name_label.setFont(tmp_font)
 		self.nn_layout.addWidget(self.name_label, alignment=Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignHCenter)
-
-		self.main_layout.addWidget(self.nn_widget, alignment=Qt.AlignmentFlag.AlignLeft)
+		self.main_layout.addWidget(self.nn_widget, alignment=Qt.AlignmentFlag.AlignLeft, stretch=0)
 
 		self.sep1 = QFrame()
 		self.sep1.setFrameShape(QFrame.VLine)
@@ -63,21 +65,15 @@ class RSAPMainWindow(QMainWindow):
 
 		self.step_btn = QPushButton('Step', self)
 		self.step_btn.setFixedWidth(self.width() // 2)
-		self.step_btn.setFixedHeight(self.height() // 5)
+		self.step_btn.setFixedHeight(self.height() // 3)
 		tmp_font = self.step_btn.font()
 		tmp_font.setPointSize(self.height() // 20)
 		self.tools_layout.addWidget(self.step_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
 
 		self.start_btn = QPushButton('Start', self)
 		self.start_btn.setFixedWidth(self.width() // 2)
-		self.start_btn.setFixedHeight(self.height() // 5)
+		self.start_btn.setFixedHeight(self.height() // 3)
 		self.tools_layout.addWidget(self.start_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
-
-		self.autostop_chk = QCheckBox('Auto Stop', self)
-		self.tools_layout.addWidget(self.autostop_chk, alignment=Qt.AlignmentFlag.AlignHCenter)
-		
-		self.adup_chk = QCheckBox('Anti-duplication', self)
-		self.tools_layout.addWidget(self.adup_chk, alignment=Qt.AlignmentFlag.AlignHCenter)
 
 		self.sep2 = QFrame()
 		self.sep2.setFrameShape(QFrame.HLine)
@@ -96,7 +92,6 @@ class RSAPMainWindow(QMainWindow):
 
 		self.misc_label = QLabel('RSAP version 0.0pre. <a href="hide_wnd">Hide Window</a>', self)
 		self.misc_label.setOpenExternalLinks(False)
-		self.misc_label.linkActivated.connect(self.hidebtn_clicked)
 		self.tools_layout.addWidget(self.misc_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 		self.tools_layout.setSpacing(self.height() // 40)
 
@@ -112,4 +107,11 @@ class RSAPMainWindow(QMainWindow):
 		self.hiddenwnd.show()
 		self.hide()
 	
-	def connect_signals(self): pass
+	def update_nn(self, idx, name):
+		self.number_label.setText(str(idx))
+		self.name_label.setText(str(name))
+		self.adjustSize()
+
+	def connect_signals(self):
+		self.step_btn.clicked.connect(self.random_engine.step)
+		self.misc_label.linkActivated.connect(self.hidebtn_clicked)
