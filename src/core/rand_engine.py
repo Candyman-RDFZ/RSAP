@@ -11,22 +11,22 @@ class RandomEngine:
 			'tot': 4,
 			'0': {
 				'idx': '1',
-				'name': '冯心仪',
+				'name': 'Raina',
 				'weight': 1
 			},
 			'1': {
-				'idx': '02',
-				'name': '胡熙冉',
+				'idx': '2',
+				'name': '<test>',
 				'weight': 1
 			},
 			'2': {
-				'idx': '03',
-				'name': '李景仪',
+				'idx': '3',
+				'name': 'Jenny',
 				'weight': 1
 			},
 			'3': {
-				'idx': '04',
-				'name': '齐泽雨',
+				'idx': '4',
+				'name': 'Susan',
 				'weight': 1
 			}
 		}
@@ -50,5 +50,4 @@ class RandomEngine:
 		name = self.data[str(cur)]['name']
 		lgr.info(f'Current person: No. {idx} ({name})')
 		self.parent_wnd.update_nn(idx, name)
-
 	

@@ -25,7 +25,7 @@ class RSAPMainWindow(QMainWindow):
 		self.hiddenwnd = RSAPHiddenWnd(self)
 
 		self.setWindowTitle('RSAP')
-		self.resize(get_window_dimension())
+		self.setFixedSize(get_window_dimension())
 		lgr.info('Window parameters set')
 
 		self.setup_ui()
@@ -53,7 +53,8 @@ class RSAPMainWindow(QMainWindow):
 		tmp_font.setPointSize(self.height() // 6)
 		self.name_label.setFont(tmp_font)
 		self.nn_layout.addWidget(self.name_label, alignment=Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignHCenter)
-		self.main_layout.addWidget(self.nn_widget, alignment=Qt.AlignmentFlag.AlignLeft, stretch=0)
+		self.nn_layout.setSpacing(0);
+		self.main_layout.addWidget(self.nn_widget, alignment=Qt.AlignmentFlag.AlignHCenter, stretch=1)
 
 		self.sep1 = QFrame()
 		self.sep1.setFrameShape(QFrame.VLine)
@@ -64,14 +65,14 @@ class RSAPMainWindow(QMainWindow):
 		self.tools_widget.setLayout(self.tools_layout)
 
 		self.step_btn = QPushButton('Step', self)
-		self.step_btn.setFixedWidth(self.width() // 2)
+		self.step_btn.setFixedWidth(self.width() * 2 // 5)
 		self.step_btn.setFixedHeight(self.height() // 3)
 		tmp_font = self.step_btn.font()
 		tmp_font.setPointSize(self.height() // 20)
 		self.tools_layout.addWidget(self.step_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
 
 		self.start_btn = QPushButton('Start', self)
-		self.start_btn.setFixedWidth(self.width() // 2)
+		self.start_btn.setFixedWidth(self.width() * 2 // 5)
 		self.start_btn.setFixedHeight(self.height() // 3)
 		self.tools_layout.addWidget(self.start_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
 
@@ -82,9 +83,11 @@ class RSAPMainWindow(QMainWindow):
 		self.misc_layout = QHBoxLayout()
 
 		self.settings_btn = QPushButton('Settings', self)
+		self.settings_btn.setFixedHeight(self.height() // 8)
 		self.misc_layout.addWidget(self.settings_btn)
 
 		self.about_btn = QPushButton('About', self)
+		self.about_btn.setFixedHeight(self.height() // 8)
 		self.misc_layout.addWidget(self.about_btn)
 		self.misc_layout.setSpacing(self.height() // 30)
 
@@ -94,8 +97,9 @@ class RSAPMainWindow(QMainWindow):
 		self.misc_label.setOpenExternalLinks(False)
 		self.tools_layout.addWidget(self.misc_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 		self.tools_layout.setSpacing(self.height() // 40)
+		self.tools_layout.setContentsMargins(10, 0, 10, 0)
 
-		self.main_layout.addWidget(self.tools_widget, alignment=Qt.AlignmentFlag.AlignCenter, stretch=1)
+		self.main_layout.addWidget(self.tools_widget, alignment=Qt.AlignmentFlag.AlignCenter, stretch=0)
 		self.main_layout.setContentsMargins(0, 0, 0, 0)
 		self.main_layout.setSpacing(0)
 		self.setCentralWidget(self.main_widget)

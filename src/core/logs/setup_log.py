@@ -1,12 +1,10 @@
 import sys
-import pathlib
 import logging
 
 from .fmts import ColoredFormatter, IndentedFormatter
 from core.utils import sanitize_path as p
 
-def setup_logging(logfile=p('logs/RSAP.log'), level=logging.INFO):
-	pathlib.Path(logfile).parent.mkdir(exist_ok=True)
+def setup_logging(logfile=p('RSAP.log'), level=logging.INFO):
 	logger = logging.getLogger()
 	logger.setLevel(level)
 
