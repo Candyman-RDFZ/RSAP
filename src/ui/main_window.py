@@ -118,4 +118,5 @@ class RSAPMainWindow(QMainWindow):
 
 	def connect_signals(self):
 		self.step_btn.clicked.connect(self.random_engine.step)
+		self.start_btn.clicked.connect(self.random_engine.toggle)
 		self.misc_label.linkActivated.connect(self.hidebtn_clicked)
