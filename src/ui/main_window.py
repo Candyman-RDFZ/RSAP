@@ -69,11 +69,13 @@ class RSAPMainWindow(QMainWindow):
 		self.step_btn.setFixedHeight(self.height() // 3)
 		tmp_font = self.step_btn.font()
 		tmp_font.setPointSize(self.height() // 20)
+		self.step_btn.setFont(tmp_font)
 		self.tools_layout.addWidget(self.step_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
 
 		self.start_btn = QPushButton('Start', self)
 		self.start_btn.setFixedWidth(self.width() * 2 // 5)
 		self.start_btn.setFixedHeight(self.height() // 3)
+		self.start_btn.setFont(tmp_font)
 		self.tools_layout.addWidget(self.start_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
 
 		self.sep2 = QFrame()
