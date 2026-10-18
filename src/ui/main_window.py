@@ -5,6 +5,7 @@ from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QL
 from core.utils import get_window_dimension
 from core.config import PLATFORM
 from ui.hidden_wnd import RSAPHiddenWnd
+from ui.settings_wnd import SettingsWnd
 from core.rand_engine import RandomEngine
 
 import logging
@@ -23,6 +24,7 @@ class RSAPMainWindow(QMainWindow):
 		self.setWindowFlags(Qt.WindowStaysOnTopHint & ~Qt.WindowType.WindowMaximizeButtonHint)
 
 		self.hiddenwnd = RSAPHiddenWnd(self)
+		self.settings_wnd = SettingsWnd(self)
 
 		self.setWindowTitle('RSAP')
 		self.setFixedSize(get_window_dimension())
@@ -122,3 +124,4 @@ class RSAPMainWindow(QMainWindow):
 		self.step_btn.clicked.connect(self.random_engine.step)
 		self.start_btn.clicked.connect(self.random_engine.toggle)
 		self.misc_label.linkActivated.connect(self.hidebtn_clicked)
+		self.settings_btn.clicked.connect(self.settings_wnd.exec)

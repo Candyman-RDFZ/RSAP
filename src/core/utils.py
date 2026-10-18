@@ -22,5 +22,11 @@ def get_hidewnd_pos(wnd_w: int, wnd_h: int) -> tuple:
 	geom = screen.availableGeometry()
 	return (geom.x() + geom.width() - wnd_w, geom.y() + geom.height() - wnd_h)
 
+def get_settings_wnd_dimension() -> QSize():
+	screen = QGuiApplication.primaryScreen()
+	width = screen.size().width() // 3
+	height = width
+	return QSize(width, height)
+
 def sanitize_path(path: str) -> str:
 	return str(pathlib.Path(DIR_ROOT) / path)
