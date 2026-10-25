@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton
+from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox
 
 from core.utils import get_settings_wnd_dimension as g
 
@@ -42,3 +42,9 @@ class SettingsWnd(QDialog):
 		self.cancel.clicked.connect(self.close)
 
 		self.layout.addLayout(self.buttons_layout)
+
+		self.general_layout = QVBoxLayout()
+		self.general_widget.setLayout(self.general_layout)
+		self.wnd_settings = QGroupBox('Window')
+		self.general_layout.addWidget(self.wnd_settings)
+		self.general_layout.addStretch()

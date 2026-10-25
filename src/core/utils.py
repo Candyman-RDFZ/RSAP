@@ -24,8 +24,8 @@ def get_hidewnd_pos(wnd_w: int, wnd_h: int) -> tuple:
 
 def get_settings_wnd_dimension() -> QSize():
 	screen = QGuiApplication.primaryScreen()
-	width = screen.size().width() // 3
-	height = width
+	width = screen.size().width() // 5
+	height = width * 3 // 2
 	return QSize(width, height)
 
 def sanitize_path(path: str) -> str:

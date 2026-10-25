@@ -29,7 +29,16 @@ if PLATFORM == 'Windows':
 	else:
 		lgr.info('Successfully set model ID')
 
-
+elif PLATFORM == 'Linux':
+	lgr.info('Running on Linux. Forcing X11...')
+	try:
+		import os
+		os.environ['QT_QPA_PLATFORM'] = 'xcb'
+	except Exception as e:
+		lgr.error(e)
+		lgr.warning('Failed to force X11. Window positions and flags may not be correct')
+	else:
+		lgr.info('Successfully forced X11')
 
 app = QApplication([])
 app.setApplicationName(NAME)
