@@ -1,12 +1,13 @@
-from PySide6.QtCore import Qt
+from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QFrame, QPushButton, QSizePolicy, QCheckBox, QLineEdit
 
-from core.utils import get_window_dimension
+from core.utils import get_window_dimension as g
 from core.config import PLATFORM
 from ui.hidden_wnd import RSAPHiddenWnd
 from ui.settings_wnd import SettingsWnd
 from core.rand_engine import RandomEngine
+from core.settings import load as l
 
 import logging
 
@@ -21,13 +22,18 @@ class RSAPMainWindow(QMainWindow):
 		if PLATFORM == 'Linux':
 			lgr.warning('Running on Linux. Some window features, such as stay on top, may not function correctly')
 
-		self.setWindowFlags(Qt.WindowStaysOnTopHint & ~Qt.WindowType.WindowMaximizeButtonHint)
+		if int(l('stay_on_top', 1)):
+			self.setWindowFlags(Qt.WindowStaysOnTopHint)
 
 		self.hiddenwnd = RSAPHiddenWnd(self)
 		self.settings_wnd = SettingsWnd(self)
 
 		self.setWindowTitle('RSAP')
-		self.setFixedSize(get_window_dimension())
+
+		if not int(l('wnd_behavior', 0)):
+			self.setFixedSize(g())
+		else:
+			self.resize(g())
 		lgr.info('Window parameters set')
 
 		self.setup_ui()
@@ -108,6 +114,20 @@ class RSAPMainWindow(QMainWindow):
 		self.main_layout.setSpacing(0)
 		self.setCentralWidget(self.main_widget)
 
+	def reload_settings(self):
+		if int(l('stay_on_top', 1)):
+			self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		else:
+			self.setWindowFlags(Qt.Window)
+		self.show()
+		if not int(l('wnd_behavior', 0)):
+			self.setFixedSize(g())
+		else:
+			self.setMinimumSize(QSize(0, 0))
+			self.setMaximumSize(QSize(16777215, 16777215))
+			self.resize(g())
+		lgr.info('Main window settings reloaded')
+
 	def hidebtn_clicked(self, link: str):
 		lgr.info('Hide window activated')
 		if PLATFORM == 'Linux':
@@ -118,7 +138,6 @@ class RSAPMainWindow(QMainWindow):
 	def update_nn(self, idx, name):
 		self.number_label.setText(str(idx))
 		self.name_label.setText(str(name))
-		self.adjustSize()
 
 	def connect_signals(self):
 		self.step_btn.clicked.connect(self.random_engine.step)

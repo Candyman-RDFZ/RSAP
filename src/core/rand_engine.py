@@ -45,7 +45,11 @@ class RandomEngine:
 		self.stop_timer.timeout.connect(self._timer_step)
 
 		self.log_data()
-	
+
+	def reload_settings(self):
+		
+		lgr.info('Random engine settings reloaded')
+
 	def log_data(self):
 		self.data_str = f'Data:\nTotal: {self.tot}'
 		for i in range(self.tot):
