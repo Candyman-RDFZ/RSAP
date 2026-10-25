@@ -12,4 +12,4 @@ ID = 'io.github.Candyman-RDFZ.RSAP'
 PLATFORM = platform.system()
 
 EXEC = getattr(sys, 'frozen', False)
-DIR_ROOT = pathlib.Path(sys.executable).parent if EXEC else pathlib.Path(__file__).parents[1]
+DIR_ROOT = sys._MEIPASS if EXEC else pathlib.Path(__file__).parents[1]
