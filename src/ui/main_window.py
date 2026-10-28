@@ -31,8 +31,10 @@ class RSAPMainWindow(QMainWindow):
 		self.setWindowTitle('RSAP')
 
 		if not int(l('wnd_behavior', 0)):
+			self.on_top = 1
 			self.setFixedSize(g())
 		else:
+			self.on_top = 0
 			self.resize(g())
 		lgr.info('Window parameters set')
 
@@ -115,10 +117,13 @@ class RSAPMainWindow(QMainWindow):
 		self.setCentralWidget(self.main_widget)
 
 	def reload_settings(self):
-		if int(l('stay_on_top', 1)):
+		if int(l('stay_on_top', 1)) and not self.on_top:
 			self.setWindowFlags(Qt.WindowStaysOnTopHint)
-		else:
+			self.on_top = 1
+		if not int(l('stay_on_top', 1)) and self.on_top:
 			self.setWindowFlags(Qt.Window)
+			self.on_top = 0
+
 		self.show()
 		if not int(l('wnd_behavior', 0)):
 			self.setFixedSize(g())
