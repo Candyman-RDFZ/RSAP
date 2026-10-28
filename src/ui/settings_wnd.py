@@ -1,5 +1,6 @@
-from PySide6.QtCore import Qt
-from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox
+from PySide6.QtCore import Qt, QRegularExpression
+from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox
+from PySide6.QtGui import QRegularExpressionValidator
 
 from core.utils import get_settings_wnd_dimension as g
 from core.settings import save as s, load as l
@@ -67,15 +68,44 @@ class SettingsWnd(QDialog):
 		self.sot_chk = QCheckBox('Stay on top')
 		self.sot_chk.setChecked(int(l('stay_on_top', 1)))
 		self.wnd_behavior_layout.addWidget(self.sot_chk)
-		self.wnd_behavior_layout.setSpacing(0)
 
+		self.wnd_behavior_layout.setSpacing(0)
 		self.wnd_layout.addLayout(self.wnd_behavior_layout)
 
+		self.wnd_initsz_layout = QHBoxLayout()
+		self.initsz_lbl = QLabel('Initial size:')
+		self.wnd_initsz_layout.addWidget(self.initsz_lbl)
+
+		self.initsz_x = QLineEdit()
+		self.initsz_x.setPlaceholderText('Width')
+		self.initsz_x.setMaxLength(4)
+		self.initsz_x.setValidator(QRegularExpressionValidator(QRegularExpression(r'[0-9]{1,4}'), self.initsz_x))
+		self.initsz_x.setText(str(l('initsz', '')[0]))
+		self.wnd_initsz_layout.addWidget(self.initsz_x)
+		self.initsz_y = QLineEdit()
+		self.initsz_y.setPlaceholderText('Height')
+		self.initsz_y.setMaxLength(4)
+		self.initsz_x.setValidator(QRegularExpressionValidator(QRegularExpression(r'[0-9]{1,4}'), self.initsz_y))
+		self.wnd_initsz_layout.addWidget(self.initsz_y)
+
+		self.wnd_layout.addLayout(self.wnd_initsz_layout)
+
 		self.general_layout.addStretch()
+
+	def chk_initsz(self) -> bool:
+		self.sz_x = int(self.initsz_x.text())
+		self.sz_y = int(self.initsz_y.text())
+		if 100 <= self.sz_x <= 2000 and 100 <= self.sz_y <= 2000:
+			return True
+		QMessageBox.critical(self, 'Error', 'The initial size must be between 100x100 and 2000x2000.')
 
 	def save_settings(self):
 		s('wnd_behavior', int(self.wnd_bg.buttons()[1].isChecked()))
 		s('stay_on_top', int(self.sot_chk.isChecked()))
+		
+		if not self.chk_initsz():
+			return
+		s('initsz', (int(self.initsz_x.text()), int(self.initsz_y.text())))
 
 		self.parent.reload_settings()
 		self.parent.random_engine.reload_settings()
