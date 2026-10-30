@@ -18,7 +18,7 @@ class RandomEngine:
 			},
 			1: {
 				'idx': '2',
-				'name': '<test>',
+				'name': 'ssssssssw',
 				'weight': 1
 			},
 			2: {

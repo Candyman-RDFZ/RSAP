@@ -3,7 +3,7 @@ from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QFrame, QPushButton, QSizePolicy, QCheckBox, QLineEdit
 
 from core.utils import get_window_dimension as g
-from core.config import PLATFORM
+from core.config import PLATFORM, FULL_NAME
 from ui.hidden_wnd import RSAPHiddenWnd
 from ui.settings_wnd import SettingsWnd
 from core.rand_engine import RandomEngine
@@ -44,6 +44,7 @@ class RSAPMainWindow(QMainWindow):
 
 		self.connect_signals()
 		lgr.info('Signals are now connected')
+		self.resize_widgets()
 
 	def setup_ui(self):
 		self.main_layout = QHBoxLayout()
@@ -54,12 +55,19 @@ class RSAPMainWindow(QMainWindow):
 		self.nn_widget = QWidget()
 		self.nn_widget.setLayout(self.nn_layout)
 
-		self.number_label = QLabel('??', self)
+		self.number_label = QLineEdit()
+		self.number_label.setText('??')
+		self.number_label.setReadOnly(True)
+		self.number_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 		self.number_label.setFont(QFont('Consolas', self.height() // 2))
-		self.number_label.setStyleSheet('color: #0094FF; font-weight: bold;')
+		self.number_label.setStyleSheet('color: #0094FF; font-weight: bold; background: transparent; border: none;')
 		self.nn_layout.addWidget(self.number_label, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
 		
-		self.name_label = QLabel('', self)
+		self.name_label = QLineEdit()
+		self.name_label.setText('')
+		self.name_label.setReadOnly(True)
+		self.name_label.setStyleSheet('background: transparent; border: none;')
+		self.name_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 		tmp_font = self.name_label.font()
 		tmp_font.setPointSize(self.height() // 6)
 		self.name_label.setFont(tmp_font)
@@ -108,7 +116,7 @@ class RSAPMainWindow(QMainWindow):
 
 		self.tools_layout.addLayout(self.misc_layout)
 
-		self.misc_label = QLabel('RSAP version 0.0pre. <a href="hide_wnd">Hide Window</a>', self)
+		self.misc_label = QLabel(f'{FULL_NAME} <a href="hide_wnd">Hide Window</a>', self)
 		self.misc_label.setOpenExternalLinks(False)
 		self.tools_layout.addWidget(self.misc_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 		self.tools_layout.setSpacing(self.height() // 40)
@@ -150,12 +158,19 @@ class RSAPMainWindow(QMainWindow):
 		self.start_btn.setFixedWidth(self.width() * 2 // 5)
 		self.start_btn.setFixedHeight(self.height() // 3)
 		self.start_btn.setFont(tmp_font)
+		tmp_font.setPointSize(self.height() // 25)
 		self.settings_btn.setFixedHeight(self.height() // 8)
 		self.about_btn.setFixedHeight(self.height() // 8)
 		self.settings_btn.setFixedWidth(self.width() * 23 // 120)
 		self.about_btn.setFixedWidth(self.width() * 23 // 120)
+		self.settings_btn.setFont(tmp_font)
+		self.about_btn.setFont(tmp_font)
 		self.misc_layout.setSpacing(self.width() // 60)
 		self.tools_layout.setSpacing(self.height() // 40)
+		if self.width() <= 400:
+			self.misc_label.setText('<a href="hide_wnd">Hide Window</a>')
+		else:
+			self.misc_label.setText(f'{FULL_NAME}. <a href="hide_wnd">Hide Window</a>')
 
 	def hidebtn_clicked(self, link: str):
 		lgr.info('Hide window activated')
@@ -167,6 +182,7 @@ class RSAPMainWindow(QMainWindow):
 	def update_nn(self, idx, name):
 		self.number_label.setText(str(idx))
 		self.name_label.setText(str(name))
+		self.name_label.home(False)
 
 	def connect_signals(self):
 		self.step_btn.clicked.connect(self.random_engine.step)
