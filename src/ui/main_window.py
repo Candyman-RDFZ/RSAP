@@ -76,7 +76,7 @@ class RSAPMainWindow(QMainWindow):
 		self.tools_widget.setLayout(self.tools_layout)
 
 		self.step_btn = QPushButton('Step', self)
-		self.step_btn.setFixedWidth(self.height() * 4 // 5)
+		self.step_btn.setFixedWidth(self.width() * 2 // 5)
 		self.step_btn.setFixedHeight(self.height() // 3)
 		tmp_font = self.step_btn.font()
 		tmp_font.setPointSize(self.height() // 20)
@@ -84,7 +84,7 @@ class RSAPMainWindow(QMainWindow):
 		self.tools_layout.addWidget(self.step_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
 
 		self.start_btn = QPushButton('Start', self)
-		self.start_btn.setFixedWidth(self.height() * 4 // 5)
+		self.start_btn.setFixedWidth(self.width() * 2 // 5)
 		self.start_btn.setFixedHeight(self.height() // 3)
 		self.start_btn.setFont(tmp_font)
 		self.tools_layout.addWidget(self.start_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
@@ -97,14 +97,14 @@ class RSAPMainWindow(QMainWindow):
 
 		self.settings_btn = QPushButton('Settings', self)
 		self.settings_btn.setFixedHeight(self.height() // 8)
-		self.settings_btn.setFixedWidth(self.height() * 23 // 60)
+		self.settings_btn.setFixedWidth(self.width() * 23 // 120)
 		self.misc_layout.addWidget(self.settings_btn)
 
 		self.about_btn = QPushButton('About', self)
 		self.about_btn.setFixedHeight(self.height() // 8)
-		self.about_btn.setFixedWidth(self.height() * 23 // 60)
+		self.about_btn.setFixedWidth(self.width() * 23 // 120)
 		self.misc_layout.addWidget(self.about_btn)
-		self.misc_layout.setSpacing(self.height() // 30)
+		self.misc_layout.setSpacing(self.width() // 60)
 
 		self.tools_layout.addLayout(self.misc_layout)
 
@@ -142,18 +142,20 @@ class RSAPMainWindow(QMainWindow):
 		tmp_font = self.name_label.font()
 		tmp_font.setPointSize(self.height() // 6)
 		self.name_label.setFont(tmp_font)
-		self.step_btn.setFixedWidth(self.height() * 4 // 5)
+		self.step_btn.setFixedWidth(self.width() * 2 // 5)
 		self.step_btn.setFixedHeight(self.height() // 3)
 		tmp_font = self.step_btn.font()
 		tmp_font.setPointSize(self.height() // 20)
 		self.step_btn.setFont(tmp_font)
-		self.start_btn.setFixedWidth(self.height() * 4 // 5)
+		self.start_btn.setFixedWidth(self.width() * 2 // 5)
 		self.start_btn.setFixedHeight(self.height() // 3)
 		self.start_btn.setFont(tmp_font)
 		self.settings_btn.setFixedHeight(self.height() // 8)
 		self.about_btn.setFixedHeight(self.height() // 8)
-		self.settings_btn.setFixedWidth(self.height() * 23 // 60)
-		self.about_btn.setFixedWidth(self.height() * 23 // 60)
+		self.settings_btn.setFixedWidth(self.width() * 23 // 120)
+		self.about_btn.setFixedWidth(self.width() * 23 // 120)
+		self.misc_layout.setSpacing(self.width() // 60)
+		self.tools_layout.setSpacing(self.height() // 40)
 
 	def hidebtn_clicked(self, link: str):
 		lgr.info('Hide window activated')
