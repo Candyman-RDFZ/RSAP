@@ -1,8 +1,8 @@
-from PySide6.QtCore import Qt, QRegularExpression
+from PySide6.QtCore import Qt, QSize, QRegularExpression
 from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox
 from PySide6.QtGui import QRegularExpressionValidator
 
-from core.utils import get_settings_wnd_dimension as g
+from core.utils import get_settings_wnd_dimension as g, get_window_dimension as gw
 from core.settings import save as s, load as l
 
 import logging
@@ -80,12 +80,13 @@ class SettingsWnd(QDialog):
 		self.initsz_x.setPlaceholderText('Width')
 		self.initsz_x.setMaxLength(4)
 		self.initsz_x.setValidator(QRegularExpressionValidator(QRegularExpression(r'[0-9]{1,4}'), self.initsz_x))
-		self.initsz_x.setText(str(l('initsz', '')[0]))
+		self.initsz_x.setText(str(l('initsz', gw()).width()))
 		self.wnd_initsz_layout.addWidget(self.initsz_x)
 		self.initsz_y = QLineEdit()
 		self.initsz_y.setPlaceholderText('Height')
 		self.initsz_y.setMaxLength(4)
 		self.initsz_x.setValidator(QRegularExpressionValidator(QRegularExpression(r'[0-9]{1,4}'), self.initsz_y))
+		self.initsz_y.setText(str(l('initsz', gw()).height()))
 		self.wnd_initsz_layout.addWidget(self.initsz_y)
 
 		self.wnd_layout.addLayout(self.wnd_initsz_layout)
@@ -105,7 +106,7 @@ class SettingsWnd(QDialog):
 		
 		if not self.chk_initsz():
 			return
-		s('initsz', (int(self.initsz_x.text()), int(self.initsz_y.text())))
+		s('initsz', QSize(int(self.initsz_x.text()), int(self.initsz_y.text())))
 
 		self.parent.reload_settings()
 		self.parent.random_engine.reload_settings()

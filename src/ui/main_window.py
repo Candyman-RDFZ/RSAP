@@ -23,7 +23,10 @@ class RSAPMainWindow(QMainWindow):
 			lgr.warning('Running on Linux. Some window features, such as stay on top, may not function correctly')
 
 		if int(l('stay_on_top', 1)):
+			self.on_top = 1
 			self.setWindowFlags(Qt.WindowStaysOnTopHint)
+		else:
+			self.on_top = 0
 
 		self.hiddenwnd = RSAPHiddenWnd(self)
 		self.settings_wnd = SettingsWnd(self)
@@ -31,11 +34,9 @@ class RSAPMainWindow(QMainWindow):
 		self.setWindowTitle('RSAP')
 
 		if not int(l('wnd_behavior', 0)):
-			self.on_top = 1
-			self.setFixedSize(g())
+			self.setFixedSize(l('initsz', g()))
 		else:
-			self.on_top = 0
-			self.resize(g())
+			self.resize(l('initsz', g()))
 		lgr.info('Window parameters set')
 
 		self.setup_ui()
@@ -75,7 +76,7 @@ class RSAPMainWindow(QMainWindow):
 		self.tools_widget.setLayout(self.tools_layout)
 
 		self.step_btn = QPushButton('Step', self)
-		self.step_btn.setFixedWidth(self.width() * 2 // 5)
+		self.step_btn.setFixedWidth(self.height() * 4 // 5)
 		self.step_btn.setFixedHeight(self.height() // 3)
 		tmp_font = self.step_btn.font()
 		tmp_font.setPointSize(self.height() // 20)
@@ -83,7 +84,7 @@ class RSAPMainWindow(QMainWindow):
 		self.tools_layout.addWidget(self.step_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
 
 		self.start_btn = QPushButton('Start', self)
-		self.start_btn.setFixedWidth(self.width() * 2 // 5)
+		self.start_btn.setFixedWidth(self.height() * 4 // 5)
 		self.start_btn.setFixedHeight(self.height() // 3)
 		self.start_btn.setFont(tmp_font)
 		self.tools_layout.addWidget(self.start_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
@@ -96,10 +97,12 @@ class RSAPMainWindow(QMainWindow):
 
 		self.settings_btn = QPushButton('Settings', self)
 		self.settings_btn.setFixedHeight(self.height() // 8)
+		self.settings_btn.setFixedWidth(self.height() * 23 // 60)
 		self.misc_layout.addWidget(self.settings_btn)
 
 		self.about_btn = QPushButton('About', self)
 		self.about_btn.setFixedHeight(self.height() // 8)
+		self.about_btn.setFixedWidth(self.height() * 23 // 60)
 		self.misc_layout.addWidget(self.about_btn)
 		self.misc_layout.setSpacing(self.height() // 30)
 
@@ -126,12 +129,31 @@ class RSAPMainWindow(QMainWindow):
 
 		self.show()
 		if not int(l('wnd_behavior', 0)):
-			self.setFixedSize(g())
+			self.setFixedSize(l('initsz', g()))
 		else:
 			self.setMinimumSize(QSize(0, 0))
 			self.setMaximumSize(QSize(16777215, 16777215))
-			self.resize(g())
+			self.resize(l('initsz', g()))
+		self.resize_widgets()
 		lgr.info('Main window settings reloaded')
+
+	def resize_widgets(self):
+		self.number_label.setFont(QFont('Consolas', self.height() // 2))
+		tmp_font = self.name_label.font()
+		tmp_font.setPointSize(self.height() // 6)
+		self.name_label.setFont(tmp_font)
+		self.step_btn.setFixedWidth(self.height() * 4 // 5)
+		self.step_btn.setFixedHeight(self.height() // 3)
+		tmp_font = self.step_btn.font()
+		tmp_font.setPointSize(self.height() // 20)
+		self.step_btn.setFont(tmp_font)
+		self.start_btn.setFixedWidth(self.height() * 4 // 5)
+		self.start_btn.setFixedHeight(self.height() // 3)
+		self.start_btn.setFont(tmp_font)
+		self.settings_btn.setFixedHeight(self.height() // 8)
+		self.about_btn.setFixedHeight(self.height() // 8)
+		self.settings_btn.setFixedWidth(self.height() * 23 // 60)
+		self.about_btn.setFixedWidth(self.height() * 23 // 60)
 
 	def hidebtn_clicked(self, link: str):
 		lgr.info('Hide window activated')

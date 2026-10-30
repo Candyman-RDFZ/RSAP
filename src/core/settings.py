@@ -14,5 +14,6 @@ def save(key: str, value):
 def load(key: str, default):
 	global settings
 	if not settings.contains(key):
+		lgr.info(f'Settings {key} does not yet exist. Setting to default value {default}')
 		save(key, default)
 	return settings.value(key)
