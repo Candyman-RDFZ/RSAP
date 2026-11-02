@@ -179,9 +179,10 @@ class RSAPMainWindow(QMainWindow):
 		self.hiddenwnd.show()
 		self.hide()
 	
-	def update_nn(self, idx, name):
+	def update_nn(self, idx, name, weight, chance):
 		self.number_label.setText(str(idx))
 		self.name_label.setText(str(name))
+		self.nn_widget.setToolTip(f'No. {idx}; Name: {name}; Weight: {weight}; Chance: {chance:.2f}%')
 		self.name_label.home(False)
 
 	def connect_signals(self):

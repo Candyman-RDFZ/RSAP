@@ -88,12 +88,14 @@ class RandomEngine:
 		cur = self.rng.choice(self.pool)
 		idx = self.data[cur]['idx']
 		name = self.data[cur]['name']
+		weight = self.data[cur]['weight']
+		chance = self.data[cur]['weight'] / self.tot_weight * 100
 		lgr.info(f'Current person: No. {idx} ({name})')
-		return (idx, name)
+		return (idx, name, weight, chance)
 
 	def step(self, started=False):
-		idx, name = self._step()
-		self.parent_wnd.update_nn(idx, name)
+		idx, name, weight, chance = self._step()
+		self.parent_wnd.update_nn(idx, name, weight, chance)
 		if started:
 			self._stop_cnt -= 1
 			lgr.info(f'Stop count is now {self._stop_cnt}')
