@@ -5,6 +5,7 @@ from PySide6.QtGui import QRegularExpressionValidator
 from core.utils import get_settings_wnd_dimension as g, get_window_dimension as gw
 from core.settings import save as s, load as l
 
+from random import randint
 import logging
 
 lgr = logging.getLogger(__name__)
@@ -49,6 +50,7 @@ class SettingsWnd(QDialog):
 
 		self.general_layout = QVBoxLayout()
 		self.general_widget.setLayout(self.general_layout)
+
 		self.wnd_settings = QGroupBox('Window')
 		self.wnd_layout = QVBoxLayout()
 		self.wnd_settings.setLayout(self.wnd_layout)
@@ -77,21 +79,61 @@ class SettingsWnd(QDialog):
 		self.wnd_initsz_layout.addWidget(self.initsz_lbl)
 
 		self.initsz_x = QLineEdit()
-		self.initsz_x.setPlaceholderText('Width')
+		self.initsz_wd = QLabel('Width:')
 		self.initsz_x.setMaxLength(4)
 		self.initsz_x.setValidator(QRegularExpressionValidator(QRegularExpression(r'[0-9]{1,4}'), self.initsz_x))
 		self.initsz_x.setText(str(l('initsz', gw()).width()))
+		self.wnd_initsz_layout.addWidget(self.initsz_wd)
 		self.wnd_initsz_layout.addWidget(self.initsz_x)
+
 		self.initsz_y = QLineEdit()
+		self.initsz_he = QLabel('Height:')
 		self.initsz_y.setPlaceholderText('Height')
 		self.initsz_y.setMaxLength(4)
 		self.initsz_x.setValidator(QRegularExpressionValidator(QRegularExpression(r'[0-9]{1,4}'), self.initsz_y))
 		self.initsz_y.setText(str(l('initsz', gw()).height()))
+		self.wnd_initsz_layout.addWidget(self.initsz_he)
 		self.wnd_initsz_layout.addWidget(self.initsz_y)
 
 		self.wnd_layout.addLayout(self.wnd_initsz_layout)
 
+		self.seed_settings = QGroupBox('Seed')
+		self.seed_layout = QHBoxLayout()
+		self.seed_settings.setLayout(self.seed_layout)
+		self.general_layout.addWidget(self.seed_settings)
+
+		self.seed_type_lbl = QLabel('Type:')
+		self.seed_layout.addWidget(self.seed_type_lbl)
+
+		self.seed_bg = QButtonGroup()
+		self.seed_type = int(l('seed_type', 0))
+		self.cur_seed = l('rand_seed', randint(0, int(1e15)))
+
+		for txt in ['Random', 'Custom']:
+			rb = QRadioButton(txt)
+			self.seed_bg.addButton(rb)
+			self.seed_layout.addWidget(rb)
+		self.seed_bg.buttons()[self.seed_type].setChecked(True)
+		self.seed_bg.idClicked.connect(self.seed_btn_changed)
+
+		self.seed_entry = QLineEdit()
+		self.seed_entry.setValidator(QRegularExpressionValidator(QRegularExpression(r'[0-9]{1,15}'), self.seed_entry))
+		self.seed_entry.setText(str(self.cur_seed) if self.seed_type else '<Random>')
+		self.seed_entry.setEnabled(self.seed_type)
+		self.seed_layout.addWidget(self.seed_entry)
+
 		self.general_layout.addStretch()
+
+	def seed_btn_changed(self, button_id):
+		self.seed_type = self.seed_bg.buttons()[1].isChecked()
+		if self.seed_type:
+			self.seed_entry.setText(str(self.cur_seed))
+		else:
+			try:
+				self.cur_seed = int(self.seed_entry.text())
+			except: pass
+			self.seed_entry.setText('<Random>')
+		self.seed_entry.setEnabled(self.seed_type)
 
 	def chk_initsz(self) -> bool:
 		self.sz_x = int(self.initsz_x.text())
@@ -99,6 +141,7 @@ class SettingsWnd(QDialog):
 		if 100 <= self.sz_x <= 2000 and 100 <= self.sz_y <= 2000:
 			return True
 		QMessageBox.critical(self, 'Error', 'The initial size must be between 100x100 and 2000x2000.')
+		return False
 
 	def save_settings(self):
 		s('wnd_behavior', int(self.wnd_bg.buttons()[1].isChecked()))
@@ -107,6 +150,9 @@ class SettingsWnd(QDialog):
 		if not self.chk_initsz():
 			return
 		s('initsz', QSize(int(self.initsz_x.text()), int(self.initsz_y.text())))
+
+		s('seed_type', int(self.seed_bg.buttons()[1].isChecked()))
+		s('rand_seed', int(self.cur_seed))
 
 		self.parent.reload_settings()
 		self.parent.random_engine.reload_settings()
