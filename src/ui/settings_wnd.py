@@ -152,6 +152,8 @@ class SettingsWnd(QDialog):
 		s('initsz', QSize(int(self.initsz_x.text()), int(self.initsz_y.text())))
 
 		s('seed_type', int(self.seed_bg.buttons()[1].isChecked()))
+		if self.seed_type:
+			self.cur_seed = self.seed_entry.text()
 		s('rand_seed', int(self.cur_seed))
 
 		self.parent.reload_settings()

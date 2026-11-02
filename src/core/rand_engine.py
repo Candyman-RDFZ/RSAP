@@ -1,6 +1,8 @@
 from PySide6.QtCore import QTimer
 
-import random
+from .settings import load as l
+
+from random import Random, randint
 import logging
 
 lgr = logging.getLogger(__name__)
@@ -9,6 +11,14 @@ class RandomEngine:
 	def __init__(self, parent_wnd):
 		lgr.info('Random engine initiated')
 		self.parent_wnd = parent_wnd
+		self.seed_type = int(l('seed_type', 0))
+		if not self.seed_type:
+			self.rng = Random()
+			lgr.info('Unseeded RNG')
+		else:
+			self.seed_val = int(l('rand_seed', randint(1, int(1e15))))
+			self.rng = Random(self.seed_val)
+			lgr.info(f'Seeded RNG with {self.seed_val}')
 		self.data = {
 			'tot': 4,
 			0: {
@@ -18,7 +28,7 @@ class RandomEngine:
 			},
 			1: {
 				'idx': '2',
-				'name': 'ssssssssw',
+				'name': '<test>',
 				'weight': 1
 			},
 			2: {
@@ -47,7 +57,14 @@ class RandomEngine:
 		self.log_data()
 
 	def reload_settings(self):
-		
+		self.seed_type = int(l('seed_type', 0))
+		if not self.seed_type:
+			self.rng = Random()
+			lgr.info('Unseeded RNG')
+		else:
+			self.seed_val = int(l('rand_seed', randint(1, int(1e15))))
+			self.rng = Random(self.seed_val)
+			lgr.info(f'Seeded RNG with {self.seed_val}')
 		lgr.info('Random engine settings reloaded')
 
 	def log_data(self):
@@ -68,7 +85,7 @@ class RandomEngine:
 		return res
 	
 	def _step(self) -> tuple:
-		cur = random.choice(self.pool)
+		cur = self.rng.choice(self.pool)
 		idx = self.data[cur]['idx']
 		name = self.data[cur]['name']
 		lgr.info(f'Current person: No. {idx} ({name})')
