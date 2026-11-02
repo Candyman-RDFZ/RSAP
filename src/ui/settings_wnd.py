@@ -128,7 +128,7 @@ class SettingsWnd(QDialog):
 		self.seed_warn = QLabel('<b>Warning</b>: Only use custom seeds for testing purposes. Setting a custom seed will cause the program to generate the same selection sequence each time.')
 		self.seed_warn.setWordWrap(True)
 		tmp_font = self.seed_warn.font()
-		tmp_font.setPointSize(self.height() // 70)
+		tmp_font.setPointSize(self.height() // 80)
 		self.seed_warn.setFont(tmp_font)
 		self.seed_layout_.addWidget(self.seed_warn)
 
