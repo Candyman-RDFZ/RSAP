@@ -98,8 +98,9 @@ class SettingsWnd(QDialog):
 		self.wnd_layout.addLayout(self.wnd_initsz_layout)
 
 		self.seed_settings = QGroupBox('Seed')
+		self.seed_layout_ = QVBoxLayout()
 		self.seed_layout = QHBoxLayout()
-		self.seed_settings.setLayout(self.seed_layout)
+		self.seed_settings.setLayout(self.seed_layout_)
 		self.general_layout.addWidget(self.seed_settings)
 
 		self.seed_type_lbl = QLabel('Type:')
@@ -121,6 +122,15 @@ class SettingsWnd(QDialog):
 		self.seed_entry.setText(str(self.cur_seed) if self.seed_type else '<Random>')
 		self.seed_entry.setEnabled(self.seed_type)
 		self.seed_layout.addWidget(self.seed_entry)
+
+		self.seed_layout_.addLayout(self.seed_layout)
+
+		self.seed_warn = QLabel('<b>Warning</b>: Only use custom seeds for testing purposes. It will result in choosing the same people every run.')
+		self.seed_warn.setWordWrap(True)
+		tmp_font = self.seed_warn.font()
+		tmp_font.setPointSize(self.height() // 70)
+		self.seed_warn.setFont(tmp_font)
+		self.seed_layout_.addWidget(self.seed_warn)
 
 		self.general_layout.addStretch()
 
