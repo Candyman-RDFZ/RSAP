@@ -50,7 +50,7 @@ class RandomEngine:
 
 		self.pool = self.build_pool()
 
-		self.stop_cnt = 20
+		self.stop_cnt = int(l('ats_num', 20))
 		self.stop_timer = QTimer(self.parent_wnd)
 		self.stop_timer.timeout.connect(self._timer_step)
 
@@ -65,6 +65,7 @@ class RandomEngine:
 			self.seed_val = int(l('rand_seed', randint(1, int(1e15))))
 			self.rng = Random(self.seed_val)
 			lgr.info(f'Seeded RNG with {self.seed_val}')
+		self.stop_cnt = int(l('ats_num', 20))
 		lgr.info('Random engine settings reloaded')
 
 	def log_data(self):

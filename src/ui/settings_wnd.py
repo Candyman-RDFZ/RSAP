@@ -1,5 +1,5 @@
 from PySide6.QtCore import Qt, QSize, QRegularExpression
-from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox
+from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox, QSpinBox
 from PySide6.QtGui import QRegularExpressionValidator
 
 from core.utils import get_settings_wnd_dimension as g, get_window_dimension as gw
@@ -132,6 +132,22 @@ class SettingsWnd(QDialog):
 		self.seed_warn.setFont(tmp_font)
 		self.seed_layout_.addWidget(self.seed_warn)
 
+		self.autostop_settings = QGroupBox('Auto Stop')
+		self.autostop_layout = QVBoxLayout()
+		self.autostop_settings.setLayout(self.autostop_layout)
+		self.general_layout.addWidget(self.autostop_settings)
+
+		self.ats_num_layout = QHBoxLayout()
+		self.ats_num_lbl = QLabel('Auto stop after selecting ')
+		self.ats_num_layout.addWidget(self.ats_num_lbl)
+		self.ats_num = QSpinBox()
+		self.ats_num.setSuffix(' person(s)')
+		self.ats_num.setRange(1, 500)
+		self.ats_num.setSingleStep(1)
+		self.ats_num.setValue(int(l('ats_num', 20)))
+		self.ats_num_layout.addWidget(self.ats_num)
+		self.autostop_layout.addLayout(self.ats_num_layout)
+
 		self.general_layout.addStretch()
 
 	def seed_btn_changed(self, button_id):
@@ -165,6 +181,8 @@ class SettingsWnd(QDialog):
 		if self.seed_type:
 			self.cur_seed = self.seed_entry.text()
 		s('rand_seed', int(self.cur_seed))
+
+		s('ats_num', self.ats_num.value())
 
 		self.parent.reload_settings()
 		self.parent.random_engine.reload_settings()
