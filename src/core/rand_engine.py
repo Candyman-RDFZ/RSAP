@@ -108,7 +108,7 @@ class RandomEngine:
 		self.step(True)
 
 	def _start(self):
-		self.stop_timer.start(100)
+		self.stop_timer.start(int(l('ats_time', 100)))
 	
 	def stop(self):
 		self.stop_timer.stop()

@@ -148,6 +148,17 @@ class SettingsWnd(QDialog):
 		self.ats_num_layout.addWidget(self.ats_num)
 		self.autostop_layout.addLayout(self.ats_num_layout)
 
+		self.ats_time_layout = QHBoxLayout()
+		self.ats_time_lbl = QLabel('Delay between each selection: ')
+		self.ats_time_layout.addWidget(self.ats_time_lbl)
+		self.ats_time = QSpinBox()
+		self.ats_time.setSuffix(' milliseconds')
+		self.ats_time.setRange(10, 1000)
+		self.ats_time.setSingleStep(10)
+		self.ats_time.setValue(int(l('ats_time', 100)))
+		self.ats_time_layout.addWidget(self.ats_time)
+		self.autostop_layout.addLayout(self.ats_time_layout)
+
 		self.general_layout.addStretch()
 
 	def seed_btn_changed(self, button_id):
@@ -183,6 +194,7 @@ class SettingsWnd(QDialog):
 		s('rand_seed', int(self.cur_seed))
 
 		s('ats_num', self.ats_num.value())
+		s('ats_time', self.ats_time.value())
 
 		self.parent.reload_settings()
 		self.parent.random_engine.reload_settings()
