@@ -33,17 +33,18 @@ class SettingsWnd(QDialog):
 
 		self.ok = QPushButton('OK')
 		self.cancel = QPushButton('Cancel')
-		self.import_btn = QPushButton('Import')
-		self.export_btn = QPushButton('Export')
+		self.apply = QPushButton('Apply')
+		self.help = QPushButton('Help')
 
-		self.buttons_layout.addWidget(self.import_btn, alignment=Qt.AlignmentFlag.AlignLeft)
-		self.buttons_layout.addWidget(self.export_btn, alignment=Qt.AlignmentFlag.AlignLeft)
+		self.buttons_layout.addWidget(self.help, alignment=Qt.AlignmentFlag.AlignLeft)
 		self.buttons_layout.addStretch()
 		self.buttons_layout.addWidget(self.ok, alignment=Qt.AlignmentFlag.AlignRight)
 		self.buttons_layout.addWidget(self.cancel, alignment=Qt.AlignmentFlag.AlignRight)
+		self.buttons_layout.addWidget(self.apply, alignment=Qt.AlignmentFlag.AlignRight)
 
 		self.ok.setDefault(True)
-		self.ok.clicked.connect(self.save_settings)
+		self.ok.clicked.connect(self.ok_callback)
+		self.apply.clicked.connect(self.save_settings)
 		self.cancel.clicked.connect(self.close)
 
 		self.layout.addLayout(self.buttons_layout)
@@ -239,4 +240,7 @@ class SettingsWnd(QDialog):
 
 		self.parent.reload_settings()
 		self.parent.random_engine.reload_settings()
+	
+	def ok_callback(self):
+		self.save_settings()
 		self.close()
