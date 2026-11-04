@@ -164,19 +164,24 @@ class SettingsWnd(QDialog):
 		self.antirep_settings.setLayout(self.antirep_layout_)
 		self.general_layout.addWidget(self.antirep_settings)
 		
-		self.antirep_enabled = True
+		self.antirep_enabled = int(l('antirep_enabled', 1))
 		self.antirep_chk = QCheckBox('Enable anti-repetition')
+		self.antirep_chk.setChecked(self.antirep_enabled)
+		self.antirep_chk.checkStateChanged.connect(self.antirep_changed)
 		self.antirep_layout_.addWidget(self.antirep_chk)
 
 		self.antirep_layout = QHBoxLayout()
 		self.antirep_layout_.addLayout(self.antirep_layout)
 		self.antirep_lbl = QLabel('Do not repeat for ')
 		self.antirep_layout.addWidget(self.antirep_lbl)
+
+		self.antirep_num = int(l('antirep_num', 2)) # TODO: change this to len(data) // 2
 		self.antirep_numspn = QSpinBox()
-		self.antirep_numspn.setSuffix(' person(s)')
 		self.antirep_numspn.setRange(1, 4) # TODO: change this to len(data)
 		self.antirep_numspn.setSingleStep(1)
-		self.antirep_numspn.setValue(int(l('antirep_num', 2))) # TODO: change this to len(data) // 2
+		self.antirep_numspn.setValue(self.antirep_num if self.antirep_enabled else 1)
+		self.antirep_numspn.setSuffix(' person(s)')
+		self.antirep_numspn.setEnabled(self.antirep_enabled)
 		self.antirep_layout.addWidget(self.antirep_numspn)
 
 		self.antirep_note = QLabel('<b>Note</b>: Setting 1 is the same as disabling.')
@@ -195,6 +200,15 @@ class SettingsWnd(QDialog):
 			except: pass
 			self.seed_entry.setText('<Random>')
 		self.seed_entry.setEnabled(self.seed_type)
+
+	def antirep_changed(self, state):
+		self.antirep_enabled = self.antirep_chk.isChecked()
+		if self.antirep_enabled:
+			self.antirep_numspn.setValue(self.antirep_num)
+		else:
+			self.antirep_num = self.antirep_numspn.value()
+			self.antirep_numspn.setValue(1)
+		self.antirep_numspn.setEnabled(self.antirep_enabled)
 
 	def chk_initsz(self) -> bool:
 		self.sz_x = int(self.initsz_x.text())
@@ -220,7 +234,8 @@ class SettingsWnd(QDialog):
 		s('ats_num', self.ats_num.value())
 		s('ats_time', self.ats_time.value())
 
-		s('antirep_num', self.antirep_numspn.value())
+		s('antirep_enabled', int(self.antirep_enabled))
+		s('antirep_num', self.antirep_num)
 
 		self.parent.reload_settings()
 		self.parent.random_engine.reload_settings()

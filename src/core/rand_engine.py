@@ -71,6 +71,7 @@ class RandomEngine:
 			self.rng = Random(self.seed_val)
 			lgr.info(f'Seeded RNG with {self.seed_val}')
 		self.stop_cnt = int(l('ats_num', 20))
+		self.antirep = int(l('antirep_enabled', 1))
 		self.antirep_num = int(l('antirep_num', len(self.data) // 2))
 		self.pool = self.build_pool()
 		self.antirep_queue = []
@@ -111,7 +112,8 @@ class RandomEngine:
 
 	def _step(self) -> tuple:
 		cur = self.rng.choice(self.pool)
-		self.process_antirep(cur)
+		if self.antirep:
+			self.process_antirep(cur)
 		idx = self.data[cur]['idx']
 		name = self.data[cur]['name']
 		weight = self.data[cur]['weight']
