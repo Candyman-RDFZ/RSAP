@@ -16,7 +16,6 @@ lgr = logging.getLogger(__name__)
 class RSAPMainWindow(QMainWindow):
 	def __init__(self):
 		super().__init__()
-		self.random_engine = RandomEngine(self)
 
 		lgr.info('Main window initiated')
 		if PLATFORM == 'Linux':
@@ -41,6 +40,8 @@ class RSAPMainWindow(QMainWindow):
 
 		self.setup_ui()
 		lgr.info('Main UI is now set up')
+
+		self.random_engine = RandomEngine(self)
 
 		self.connect_signals()
 		lgr.info('Signals are now connected')

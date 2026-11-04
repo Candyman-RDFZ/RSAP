@@ -180,9 +180,9 @@ class SettingsWnd(QDialog):
 		self.antirep_lbl = QLabel('Do not repeat for ')
 		self.antirep_layout.addWidget(self.antirep_lbl)
 
-		self.antirep_num = int(l('antirep_num', 2)) # TODO: change this to len(data) // 2
+		self.antirep_num = int(l('data', {'tot': 0, 'tot_weight': 0})['tot'] ) // 2
 		self.antirep_numspn = QSpinBox()
-		self.antirep_numspn.setRange(1, 4) # TODO: change this to len(data)
+		self.antirep_numspn.setRange(1, l('data', {'tot': 0, 'tot_weight': 0})['tot'])
 		self.antirep_numspn.setSingleStep(1)
 		self.antirep_numspn.setValue(self.antirep_num if self.antirep_enabled else 1)
 		self.antirep_numspn.setSuffix(' person(s)')
@@ -198,8 +198,10 @@ class SettingsWnd(QDialog):
 		self.ie_settings.setLayout(self.ie_layout)
 		self.general_layout.addWidget(self.ie_settings)
 
-		self.ie_lbl = QLabel('Export settings file from you current settings that can be imported on a different machine.')
+		self.ie_lbl = QLabel('Export settings file from you current settings that can be imported on a different machine. The names and chances will also be exported.')
 		self.ie_lbl.setWordWrap(True)
+		tmp_font.setPointSize(self.height() // 63)
+		self.ie_lbl.setFont(tmp_font)
 		self.ie_layout.addWidget(self.ie_lbl)
 
 		self.ie_btn = QVBoxLayout()
@@ -236,11 +238,11 @@ class SettingsWnd(QDialog):
 		self.btns_layout.addWidget(self.del_btn, alignment=Qt.AlignmentFlag.AlignTop)
 
 		self.name_table = NameTableWidget(self.add_btn, self.edit_btn, self.del_btn, self)
-		self.name_table.set_value(self.parent.random_engine.data)
-		self.name_layout.addWidget(self.name_table)
+		self.name_table.set_value(dict(l('data', {'tot': 0, 'tot_weight': 0})))
+		self.name_layout.addWidget(self.name_table, stretch=1)
 		self.name_layout.addWidget(self.btns_widget, alignment=Qt.AlignmentFlag.AlignTop)
 
-		self.name_layout_.addWidget(self.name_wdg, alignment=Qt.AlignmentFlag.AlignHCenter, stretch=1)
+		self.name_layout_.addWidget(self.name_wdg, stretch=1)
 
 	def seed_btn_changed(self, button_id):
 		self.seed_type = self.seed_bg.buttons()[1].isChecked()
@@ -288,6 +290,8 @@ class SettingsWnd(QDialog):
 
 		s('antirep_enabled', int(self.antirep_enabled))
 		s('antirep_num', self.antirep_num)
+
+		s('data', self.name_table.get_value())
 
 		self.parent.reload_settings()
 		self.parent.random_engine.reload_settings()

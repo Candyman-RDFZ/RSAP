@@ -20,30 +20,7 @@ class RandomEngine:
 			self.rng = Random(self.seed_val)
 			lgr.info(f'Seeded RNG with {self.seed_val}')
 
-		self.data = {
-			'tot': 4,
-			'tot_weight': 4,
-			0: {
-				'idx': '1',
-				'name': 'Raina',
-				'weight': 1
-			},
-			1: {
-				'idx': '2',
-				'name': '<test>',
-				'weight': 1
-			},
-			2: {
-				'idx': '3',
-				'name': 'Jenny',
-				'weight': 1
-			},
-			3: {
-				'idx': '4',
-				'name': 'Susan',
-				'weight': 1
-			}
-		}
+		self.data = dict(l('data', {'tot': 0, 'tot_weight': 0}))
 		
 		self.tot = self.data['tot']
 		self.tot_weight = self.data['tot_weight']
@@ -59,6 +36,12 @@ class RandomEngine:
 		self.antirep_queue = []
 
 		self.log_data()
+		self.upd_btns()
+	
+	def upd_btns(self):
+		if not self.pool:
+			self.parent_wnd.step_btn.setEnabled(False)
+			self.parent_wnd.start_btn.setEnabled(False)
 
 	def reload_settings(self):
 		self.seed_type = int(l('seed_type', 0))
@@ -72,8 +55,10 @@ class RandomEngine:
 		self.stop_cnt = int(l('ats_num', 20))
 		self.antirep = int(l('antirep_enabled', 1))
 		self.antirep_num = int(l('antirep_num', len(self.data) // 2))
+		self.data = dict(l('data', {'tot': 0, 'tot_weight': 0}))
 		self.pool = self.build_pool()
 		self.antirep_queue = []
+		self.upd_btns()
 		lgr.info('Random engine settings reloaded')
 
 	def log_data(self):

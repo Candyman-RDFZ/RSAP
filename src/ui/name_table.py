@@ -33,27 +33,41 @@ class NameTableWidget(QTableWidget):
 		self.add_button.clicked.connect(self.add_row)
 		self.edit_button.clicked.connect(self.edit_row)
 		self.del_button.clicked.connect(self.del_row)
+		self.itemSelectionChanged.connect(self.update_edit_del)
 
 		self.tot = 0
 		self.tot_weight = 0
-		self.data = {}
+
+		self.update_edit_del()
 	
-	def verify_data(self, index, name, weight) -> bool:
-		for i in range(self.tot):
-			if self.data[i]['idx'] == index:
-				QMessageBox.critical(self.parent, 'Error - RSAP', f'The index ({index}) cannot be the same as No. {index} (Name: {self.data[i]['name']}; Weight: {self.data[i]['weight']}).', buttons=QMessageBox.Ok)
-				return False
-		if weight < 0:
+	def update_edit_del(self):
+		sel_rows = self.selectionModel().selectedRows()
+		self.del_button.setEnabled(bool(sel_rows))
+		self.edit_button.setEnabled(bool(sel_rows))
+
+	def verify_data(self, index, name, weight, multi=False) -> bool:
+		if not multi:
+			for i in range(self.tot):
+				if self.item(i, 0).text() == index:
+					QMessageBox.critical(self.parent, 'Error - RSAP', f'The index ({index}) cannot be the same as No. {index} (Name: {self.item(i, 1).text()}; Weight: {self.item(i, 2).text()}).', buttons=QMessageBox.Ok)
+					return False
+		if weight == '':
+			QMessageBox.critical(self.parent, 'Error - RSAP', 'The weight cannot be empty.', buttons=QMessageBox.Ok)
+			return False
+		if int(weight) < 0:
 			QMessageBox.critical(self.parent, 'Error - RSAP', 'The weight cannot be smaller than 0.', buttons=QMessageBox.Ok)
 			return False
 		return True
 
 	def upd_chances(self):
 		for i in range(self.tot):
-			self.setItem(i, 3, QTableWidgetItem(str(f'{(self.data[i]['weight'] / self.tot_weight * 100):.2f}%')))
+			if self.tot_weight:
+				self.setItem(i, 3, QTableWidgetItem(str(f'{(int(self.item(i, 2).text()) / self.tot_weight * 100):.2f}%')))
+			else:
+				self.setItem(i, 3, QTableWidgetItem('/'))
 
 	def add_row(self):
-		dialog = AddDialog(self.parent, False)
+		dialog = AddDialog(self.parent)
 		if dialog.exec() != QDialog.Accepted:
 			return None
 		index, name, weight = dialog.values()
@@ -66,7 +80,6 @@ class NameTableWidget(QTableWidget):
 		self.setItem(self.tot, 0, QTableWidgetItem(index))
 		self.setItem(self.tot, 1, QTableWidgetItem(name))
 		self.setItem(self.tot, 2, QTableWidgetItem(str(weight)))
-		self.data[self.tot] = {'idx': index, 'name': name, 'weight': weight}
 		self.tot_weight += weight
 		self.tot += 1
 		self.upd_chances()
@@ -75,16 +88,37 @@ class NameTableWidget(QTableWidget):
 		sel_rows = self.selectionModel().selectedRows()
 		if not sel_rows:
 			return None
-		row = sel_rows[0].row()
-		ref_name = self.item(row, 0).text()
-		doi_num = self.item(row, 1).text()
-		
-		dialog = AddEditDialog(self.parent, True, ref_name, doi_num)
+
+		rows = [cur.row() for cur in sel_rows]
+		idxs = [self.item(row, 0).text() for row in rows]
+		names = [self.item(row, 1).text() for row in rows]
+		weights = [self.item(row, 2).text() for row in rows]
+		multi = len(rows) != 1
+
+		dialog = EditDialog(self.parent, idxs, names, multi)
 		if dialog.exec() != QDialog.Accepted:
 			return None
-		name, doi = dialog.values()
-		self.setItem(row, 0, QTableWidgetItem(name))
-		self.setItem(row, 1, QTableWidgetItem(doi))
+		values = dialog.values()
+
+		if multi:
+			if not self.verify_data(None, None, int(values), True):
+				return
+			for row in rows:
+				pre = self.item(row, 2).text()
+				self.setItem(row, 2, QTableWidgetItem(str(values)))
+				self.tot_weight -= int(pre) - int(values)
+		else:
+			if not self.verify_data(values[0], values[1], values[2]):
+				return
+			row = rows[0]
+			self.setItem(row, 0, QTableWidgetItem(values[0]))
+			self.setItem(row, 1, QTableWidgetItem(values[1]))
+			pre = self.item(row, 2).text()
+			if str(values[2]):
+				self.setItem(row, 2, QTableWidgetItem(str(values[2])))
+				self.tot_weight -= int(pre) - int(values[2])
+
+		self.upd_chances()
 
 	def del_row(self, row=None):
 		sel_rows = self.selectionModel().selectedRows()
@@ -151,19 +185,14 @@ class NameTableWidget(QTableWidget):
 			self.setItem(row1, col, item2)
 			self.setItem(row2, col, item1)
 
-	def get_value(self):
-		if self.tot == 0:
-			return None
-		res = {}
-		res['has_data'] = False
-		res['count'] = self.tot
-		for row in range(self.tot):
-			ref_name = self.item(row, 0).text()
-			doi_num = self.item(row, 1).text()
-			res[str(row + 1)] = {'ref_name': ref_name, 'doi_num': doi_num}
+	def get_value(self) -> dict:
+		res = {'tot': self.tot, 'tot_weight': self.tot_weight}
+		for i in range(tot):
+			cur_data = {'idx': self.item(i, 0).text(), 'name': self.item(i, 1).text(), 'weight': int(self.item(i, 2).text())}
+			res[i] = cur_data
 		return res
 	
-	def set_value(self, data):
+	def set_value(self, data: dict):
 		try:
 			self.tot = int(data['tot'])
 			self.tot_weight = int(data['tot_weight'])
@@ -177,12 +206,8 @@ class NameTableWidget(QTableWidget):
 				self.setItem(i, 1, QTableWidgetItem(name))
 				self.setItem(i, 2, QTableWidgetItem(str(weight)))
 				self.setItem(i, 3, QTableWidgetItem(f'{(weight / self.tot_weight * 100):.2f}%'))
-				self.data = data
 		except Exception as e:
-			print(e)
-			dialog = QMessageBox.critical(self.parent, 'Error - RSAP', 'The draft file cannot be loaded. The file is probably corrupted.', buttons=QMessageBox.Ok)
-
-			# We reset the table. Refilling support will be added later. 
+			dialog = QMessageBox.critical(self.parent, 'Error - RSAP', 'Cannot load data from settings.', buttons=QMessageBox.Ok)
 			self.clearContents()
 			self.setRowCount(0)
 			self.tot = 0
