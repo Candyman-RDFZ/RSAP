@@ -19,6 +19,7 @@ class RandomEngine:
 			self.seed_val = int(l('rand_seed', randint(1, int(1e15))))
 			self.rng = Random(self.seed_val)
 			lgr.info(f'Seeded RNG with {self.seed_val}')
+
 		self.data = {
 			'tot': 4,
 			0: {
@@ -54,6 +55,10 @@ class RandomEngine:
 		self.stop_timer = QTimer(self.parent_wnd)
 		self.stop_timer.timeout.connect(self._timer_step)
 
+		self.antirep = True
+		self.antirep_num = int(l('antirep_num', len(self.data) // 2))
+		self.antirep_queue = []
+
 		self.log_data()
 
 	def reload_settings(self):
@@ -66,6 +71,9 @@ class RandomEngine:
 			self.rng = Random(self.seed_val)
 			lgr.info(f'Seeded RNG with {self.seed_val}')
 		self.stop_cnt = int(l('ats_num', 20))
+		self.antirep_num = int(l('antirep_num', len(self.data) // 2))
+		self.pool = self.build_pool()
+		self.antirep_queue = []
 		lgr.info('Random engine settings reloaded')
 
 	def log_data(self):
@@ -85,8 +93,25 @@ class RandomEngine:
 				res.append(i)
 		return res
 	
+	def rem_from_pool(self, idx):
+		pool_len = len(self.pool)
+		self.pool = [self.pool[i] for i in range(pool_len) if self.pool[i] != idx]
+
+	def add_to_pool(self, idx):
+		weight = self.data[idx]['weight']
+		for i in range(weight):
+			self.pool.append(idx)
+
+	def process_antirep(self, idx):
+		self.antirep_queue.append(idx)
+		self.rem_from_pool(idx)
+		if len(self.antirep_queue) == min(self.antirep_num, self.tot):
+			popped = self.antirep_queue.pop(0)
+			self.add_to_pool(popped)
+
 	def _step(self) -> tuple:
 		cur = self.rng.choice(self.pool)
+		self.process_antirep(cur)
 		idx = self.data[cur]['idx']
 		name = self.data[cur]['name']
 		weight = self.data[cur]['weight']

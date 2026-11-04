@@ -159,6 +159,30 @@ class SettingsWnd(QDialog):
 		self.ats_time_layout.addWidget(self.ats_time)
 		self.autostop_layout.addLayout(self.ats_time_layout)
 
+		self.antirep_settings = QGroupBox('Anti-Repetition')
+		self.antirep_layout_ = QVBoxLayout()
+		self.antirep_settings.setLayout(self.antirep_layout_)
+		self.general_layout.addWidget(self.antirep_settings)
+		
+		self.antirep_enabled = True
+		self.antirep_chk = QCheckBox('Enable anti-repetition')
+		self.antirep_layout_.addWidget(self.antirep_chk)
+
+		self.antirep_layout = QHBoxLayout()
+		self.antirep_layout_.addLayout(self.antirep_layout)
+		self.antirep_lbl = QLabel('Do not repeat for ')
+		self.antirep_layout.addWidget(self.antirep_lbl)
+		self.antirep_numspn = QSpinBox()
+		self.antirep_numspn.setSuffix(' person(s)')
+		self.antirep_numspn.setRange(1, 4) # TODO: change this to len(data)
+		self.antirep_numspn.setSingleStep(1)
+		self.antirep_numspn.setValue(int(l('antirep_num', 2))) # TODO: change this to len(data) // 2
+		self.antirep_layout.addWidget(self.antirep_numspn)
+
+		self.antirep_note = QLabel('<b>Note</b>: Setting 1 is the same as disabling.')
+		self.antirep_note.setFont(tmp_font)
+		self.antirep_layout_.addWidget(self.antirep_note)
+
 		self.general_layout.addStretch()
 
 	def seed_btn_changed(self, button_id):
@@ -195,6 +219,8 @@ class SettingsWnd(QDialog):
 
 		s('ats_num', self.ats_num.value())
 		s('ats_time', self.ats_time.value())
+
+		s('antirep_num', self.antirep_numspn.value())
 
 		self.parent.reload_settings()
 		self.parent.random_engine.reload_settings()
