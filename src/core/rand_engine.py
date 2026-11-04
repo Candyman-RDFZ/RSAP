@@ -22,6 +22,7 @@ class RandomEngine:
 
 		self.data = {
 			'tot': 4,
+			'tot_weight': 4,
 			0: {
 				'idx': '1',
 				'name': 'Raina',
@@ -45,9 +46,7 @@ class RandomEngine:
 		}
 		
 		self.tot = self.data['tot']
-		self.tot_weight = 0
-		for i in range(self.tot):
-			self.tot_weight += self.data[i]['weight']
+		self.tot_weight = self.data['tot_weight']
 
 		self.pool = self.build_pool()
 

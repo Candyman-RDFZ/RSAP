@@ -1,9 +1,12 @@
-from PySide6.QtCore import Qt, QSize, QRegularExpression
+from PySide6.QtCore import Qt, QSize, QRegularExpression, QUrl
+from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox, QSpinBox
 from PySide6.QtGui import QRegularExpressionValidator
 
 from core.utils import get_settings_wnd_dimension as g, get_window_dimension as gw
 from core.settings import save as s, load as l
+
+from ui.name_table import NameTableWidget
 
 from random import randint
 import logging
@@ -46,6 +49,7 @@ class SettingsWnd(QDialog):
 		self.ok.clicked.connect(self.ok_callback)
 		self.apply.clicked.connect(self.save_settings)
 		self.cancel.clicked.connect(self.close)
+		self.help.clicked.connect(lambda: QDesktopServices.openUrl(QUrl('https://candyman33.cc/p/RSAP/h/')))
 
 		self.layout.addLayout(self.buttons_layout)
 
@@ -189,7 +193,54 @@ class SettingsWnd(QDialog):
 		self.antirep_note.setFont(tmp_font)
 		self.antirep_layout_.addWidget(self.antirep_note)
 
+		self.ie_settings = QGroupBox('Import/Export')
+		self.ie_layout = QHBoxLayout()
+		self.ie_settings.setLayout(self.ie_layout)
+		self.general_layout.addWidget(self.ie_settings)
+
+		self.ie_lbl = QLabel('Export settings file from you current settings that can be imported on a different machine.')
+		self.ie_lbl.setWordWrap(True)
+		self.ie_layout.addWidget(self.ie_lbl)
+
+		self.ie_btn = QVBoxLayout()
+		self.import_btn = QPushButton('Import')
+		self.ie_btn.addWidget(self.import_btn)
+		self.export_btn = QPushButton('Export')
+		self.ie_btn.addWidget(self.export_btn)
+		self.ie_layout.addLayout(self.ie_btn)
+
 		self.general_layout.addStretch()
+
+		# --------------------------------
+
+		self.name_layout_ = QVBoxLayout()
+		self.name_widget.setLayout(self.name_layout_)
+
+		self.name_warn = QLabel('<b>Warning</b>: Be sure to press the "Apply" button at the bottom before going back to the "General" tab to make further changes.')
+		self.name_warn.setWordWrap(True)
+		self.name_layout_.addWidget(self.name_warn)
+
+		self.name_wdg = QWidget()
+		self.name_layout = QHBoxLayout()
+		self.name_wdg.setLayout(self.name_layout)
+
+		self.btns_layout = QVBoxLayout()
+		self.btns_widget = QWidget()
+		self.btns_widget.setLayout(self.btns_layout)
+
+		self.add_btn = QPushButton('Add')
+		self.edit_btn = QPushButton('Edit')
+		self.del_btn = QPushButton('Delete')
+		self.btns_layout.addWidget(self.add_btn, alignment=Qt.AlignmentFlag.AlignTop)
+		self.btns_layout.addWidget(self.edit_btn, alignment=Qt.AlignmentFlag.AlignTop)
+		self.btns_layout.addWidget(self.del_btn, alignment=Qt.AlignmentFlag.AlignTop)
+
+		self.name_table = NameTableWidget(self.add_btn, self.edit_btn, self.del_btn, self)
+		self.name_table.set_value(self.parent.random_engine.data)
+		self.name_layout.addWidget(self.name_table)
+		self.name_layout.addWidget(self.btns_widget, alignment=Qt.AlignmentFlag.AlignTop)
+
+		self.name_layout_.addWidget(self.name_wdg, alignment=Qt.AlignmentFlag.AlignHCenter, stretch=1)
 
 	def seed_btn_changed(self, button_id):
 		self.seed_type = self.seed_bg.buttons()[1].isChecked()
