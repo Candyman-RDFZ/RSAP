@@ -187,7 +187,7 @@ class NameTableWidget(QTableWidget):
 
 	def get_value(self) -> dict:
 		res = {'tot': self.tot, 'tot_weight': self.tot_weight}
-		for i in range(tot):
+		for i in range(self.tot):
 			cur_data = {'idx': self.item(i, 0).text(), 'name': self.item(i, 1).text(), 'weight': int(self.item(i, 2).text())}
 			res[i] = cur_data
 		return res
