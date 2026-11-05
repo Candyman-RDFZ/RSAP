@@ -19,4 +19,4 @@ def setup_logging(logfile=p('RSAP.log', False), level=logging.INFO):
 	file_handler.setFormatter(IndentedFormatter(fmt=fmt))
 
 	logger.addHandler(console_handler)
-	logger.addHandler(file_handler)
+	# logger.addHandler(file_handler)
