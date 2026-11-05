@@ -21,7 +21,7 @@ class RSAPAboutWnd(QDialog):
 		self.layout = QVBoxLayout()
 
 		self.logo = QPixmap(p('logo.png'))
-		self.logo = self.logo.scaledToWidth(self.width() // 2)
+		self.logo = self.logo.scaledToWidth(self.width() // 2, Qt.SmoothTransformation)
 		self.logo_lbl = QLabel()
 		self.logo_lbl.setPixmap(self.logo)
 		self.layout.addWidget(self.logo_lbl, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
