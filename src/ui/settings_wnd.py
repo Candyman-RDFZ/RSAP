@@ -209,8 +209,6 @@ class SettingsWnd(QDialog):
 
 		self.ie_lbl = QLabel('Export settings file from you current settings that can be imported on a different machine. The names and chances will also be exported.')
 		self.ie_lbl.setWordWrap(True)
-		tmp_font.setPointSize(self.height() // 63)
-		self.ie_lbl.setFont(tmp_font)
 		self.ie_layout.addWidget(self.ie_lbl)
 
 		self.ie_btn = QVBoxLayout()

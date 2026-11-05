@@ -19,6 +19,7 @@ class NameTableWidget(QTableWidget):
 
 		self.setColumnCount(4)
 		self.setHorizontalHeaderLabels(['Index', 'Name', 'Weight', 'Chance'])
+		self.verticalHeader().setVisible(False)
 		self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 		self.setSelectionBehavior(QAbstractItemView.SelectRows)
 		self.setEditTriggers(QAbstractItemView.NoEditTriggers)
