@@ -28,6 +28,12 @@ def get_settings_wnd_dimension() -> QSize:
 	height = width * 3 // 2
 	return QSize(width, height)
 
+def get_about_wnd_dimension() -> QSize:
+	screen = QGuiApplication.primaryScreen()
+	width = int(screen.size().width() * 0.35)
+	height = width
+	return QSize(width, height)
+
 def get_dlg_dimension() -> QSize():
 	screen = QGuiApplication.primaryScreen()
 	width = int(screen.size().width() * 0.31 * 0.6)

@@ -6,6 +6,7 @@ from core.utils import get_window_dimension as g
 from core.config import PLATFORM, FULL_NAME
 from ui.hidden_wnd import RSAPHiddenWnd
 from ui.settings_wnd import SettingsWnd
+from ui.about_wnd import RSAPAboutWnd
 from core.rand_engine import RandomEngine
 from core.settings import load as l
 
@@ -28,6 +29,7 @@ class RSAPMainWindow(QMainWindow):
 			self.on_top = 0
 
 		self.hiddenwnd = RSAPHiddenWnd(self)
+		self.aboutwnd = RSAPAboutWnd(self)
 
 		self.setWindowTitle('RSAP')
 
@@ -197,6 +199,7 @@ class RSAPMainWindow(QMainWindow):
 		self.start_btn.clicked.connect(self.random_engine.toggle)
 		self.misc_label.linkActivated.connect(self.hidebtn_clicked)
 		self.settings_btn.clicked.connect(self.on_settings)
+		self.about_btn.clicked.connect(self.aboutwnd.exec)
 
 	def on_settings(self):
 		settings_wnd = SettingsWnd(self)
