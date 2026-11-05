@@ -3,3 +3,6 @@ env/
 *.swp
 *.swo
 *.log
+build/
+dist/
+*.spec

@@ -13,6 +13,6 @@ PLATFORM = platform.system()
 
 EXEC = getattr(sys, 'frozen', False)
 ASSETS_ROOT = (pathlib.Path(sys._MEIPASS) if EXEC else pathlib.Path(__file__).parents[1]) / 'assets'
-ROOT = pathlib.Path(__file__).parents[1]
+ROOT = pathlib.Path(sys.executable).parent if EXEC else pathlib.Path(__file__).parents[1]
 
 DEFAULT_DATA = {'tot': 0, 'tot_weight': 0}
