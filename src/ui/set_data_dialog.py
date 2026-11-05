@@ -1,6 +1,6 @@
 """A custom dialog when the user clickes the add/edit buttons on the start page."""
 
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout, QSpinBox
 
 from core.utils import get_dlg_dimension as g
 
@@ -11,8 +11,9 @@ class AddDialog(QDialog):
 		self.setFixedSize(g())
 		self.index_edit = QLineEdit()
 		self.name_edit = QLineEdit()
-		self.weight_edit = QLineEdit()
-		self.weight_edit.setText(str(default_weight))
+		self.weight_edit = QSpinBox()
+		self.weight_edit.setValue(int(default_weight))
+		self.weight_edit.setMinimum(0)
 		
 		self.form = QFormLayout()
 		self.form.addRow('Index: ', self.index_edit)
@@ -28,7 +29,7 @@ class AddDialog(QDialog):
 		self.setLayout(self.layout)
 	
 	def values(self) -> tuple:
-		return (self.index_edit.text(), self.name_edit.text(), self.weight_edit.text())
+		return (self.index_edit.text(), self.name_edit.text(), self.weight_edit.value())
 
 class EditDialog(QDialog):
 	def __init__(self, parent, idxs, names, default_weight, multi: bool):
@@ -38,9 +39,9 @@ class EditDialog(QDialog):
 		self.setFixedSize(g())
 		self.index_edit = QLineEdit()
 		self.name_edit = QLineEdit()
-		self.weight_edit = QLineEdit()
+		self.weight_edit = QSpinBox()
 		if not multi:
-			self.weight_edit.setText(str(default_weight))
+			self.weight_edit.setValue(int(default_weight))
 		
 		self.form = QFormLayout()
 		self.form.addRow('Index: ', self.index_edit)
@@ -65,6 +66,6 @@ class EditDialog(QDialog):
 	
 	def values(self):
 		if self.multi:
-			return self.weight_edit.text()
+			return self.weight_edit.value()
 		else:
-			return (self.index_edit.text(), self.name_edit.text(), self.weight_edit.text())
+			return (self.index_edit.text(), self.name_edit.text(), self.weight_edit.value())

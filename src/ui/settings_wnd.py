@@ -32,6 +32,7 @@ class SettingsWnd(QDialog):
 		self.name_widget = QWidget()
 		self.tabs.addTab(self.general_widget, 'General')
 		self.tabs.addTab(self.name_widget, 'Names && Chances')
+		self.tabs.setCurrentIndex(0)
 		self.layout.addWidget(self.tabs)
 
 		self.buttons_layout = QHBoxLayout()
@@ -51,7 +52,7 @@ class SettingsWnd(QDialog):
 		self.ok.clicked.connect(self.ok_callback)
 		self.apply.clicked.connect(self.save_settings)
 		self.cancel.clicked.connect(self.close)
-		self.help.clicked.connect(lambda: QDesktopServices.openUrl(QUrl('https://candyman33.cc/p/RSAP/h/')))
+		self.help.clicked.connect(self.open_help)
 
 		self.layout.addLayout(self.buttons_layout)
 
@@ -68,12 +69,14 @@ class SettingsWnd(QDialog):
 		self.wnd_behavior = QLabel('Behavior: ')
 		self.wnd_behavior_layout.addWidget(self.wnd_behavior)
 		self.wnd_bg = QButtonGroup()
+		self.wnd_btns = []
 
 		for txt in ['Fixed', 'Resizable']:
 			rb = QRadioButton(txt)
 			self.wnd_bg.addButton(rb)
 			self.wnd_behavior_layout.addWidget(rb)
-		self.wnd_bg.buttons()[int(l('wnd_behavior', 0))].setChecked(True)
+			self.wnd_btns.append(rb)
+		self.wnd_btns[int(l('wnd_behavior', 0))].setChecked(True)
 		self.wnd_behavior_layout.addStretch()
 		self.sot_chk = QCheckBox('Stay on top')
 		self.sot_chk.setChecked(int(l('stay_on_top', 1)))
@@ -123,12 +126,14 @@ class SettingsWnd(QDialog):
 		self.seed_bg = QButtonGroup()
 		self.seed_type = int(l('seed_type', 0))
 		self.cur_seed = l('rand_seed', randint(0, int(1e15)))
+		self.seed_btns = []
 
 		for txt in ['Random', 'Custom']:
 			rb = QRadioButton(txt)
 			self.seed_bg.addButton(rb)
 			self.seed_layout.addWidget(rb)
-		self.seed_bg.buttons()[self.seed_type].setChecked(True)
+			self.seed_btns.append(rb)
+		self.seed_btns[self.seed_type].setChecked(True)
 		self.seed_bg.idClicked.connect(self.seed_btn_changed)
 
 		self.seed_entry = QLineEdit()
@@ -254,7 +259,7 @@ class SettingsWnd(QDialog):
 		self.name_layout_.addWidget(self.name_wdg, stretch=1)
 
 	def seed_btn_changed(self, button_id):
-		self.seed_type = self.seed_bg.buttons()[1].isChecked()
+		self.seed_type = self.seed_btns[1].isChecked()
 		if self.seed_type:
 			self.seed_entry.setText(str(self.cur_seed))
 		else:
@@ -282,7 +287,8 @@ class SettingsWnd(QDialog):
 		return False
 
 	def reload_settings(self):
-		self.wnd_bg.buttons()[int(l('wnd_behavior', 0))].setChecked(True)
+		self.tabs.setCurrentIndex(0)
+		self.wnd_btns[int(l('wnd_behavior', 0))].setChecked(True)
 		self.antirep_numspn.setRange(1, max(1, l('data', DEFAULT_DATA)['tot']))
 		self.sot_chk.setChecked(int(l('stay_on_top', 1)))
 		try:
@@ -305,14 +311,14 @@ class SettingsWnd(QDialog):
 		self.name_table.set_value(dict(l('data', DEFAULT_DATA)))
 
 	def save_settings(self):
-		s('wnd_behavior', int(self.wnd_bg.buttons()[1].isChecked()))
+		s('wnd_behavior', int(self.wnd_btns[1].isChecked()))
 		s('stay_on_top', int(self.sot_chk.isChecked()))
 		
 		if not self.chk_initsz():
 			return
 		s('initsz', QSize(int(self.initsz_x.text()), int(self.initsz_y.text())))
 
-		s('seed_type', int(self.seed_bg.buttons()[1].isChecked()))
+		s('seed_type', int(self.seed_btns[1].isChecked()))
 		if self.seed_type:
 			self.cur_seed = self.seed_entry.text()
 		s('rand_seed', int(self.cur_seed))
@@ -329,6 +335,9 @@ class SettingsWnd(QDialog):
 		self.parent.reload_settings()
 		self.parent.random_engine.reload_settings()
 	
+	def open_help(self):
+		QDesktopServices.openUrl(QUrl('https://candyman33.cc/p/RSAP/h/'))
+
 	def ok_callback(self):
 		self.save_settings()
 		self.close()

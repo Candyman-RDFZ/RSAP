@@ -29,6 +29,7 @@ class RSAPMainWindow(QMainWindow):
 			self.on_top = 0
 
 		self.hiddenwnd = RSAPHiddenWnd(self)
+		self.settings_wnd = SettingsWnd(self)
 		self.aboutwnd = RSAPAboutWnd(self)
 
 		self.setWindowTitle('RSAP')
@@ -202,6 +203,5 @@ class RSAPMainWindow(QMainWindow):
 		self.about_btn.clicked.connect(self.aboutwnd.exec)
 
 	def on_settings(self):
-		settings_wnd = SettingsWnd(self)
-		settings_wnd.exec()
-		del settings_wnd
+		self.settings_wnd.reload_settings()
+		self.settings_wnd.exec()

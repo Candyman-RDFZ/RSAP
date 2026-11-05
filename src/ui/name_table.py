@@ -96,7 +96,7 @@ class NameTableWidget(QTableWidget):
 		weights = [self.item(row, 2).text() for row in rows]
 		multi = len(rows) != 1
 
-		dialog = EditDialog(self.parent, idxs, names, 1, multi)
+		dialog = EditDialog(self.parent, idxs, names, 1 if multi else weights[0], multi)
 		if dialog.exec() != QDialog.Accepted:
 			return None
 		values = dialog.values()
