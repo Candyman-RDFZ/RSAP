@@ -28,14 +28,19 @@ class RSAPMainWindow(QMainWindow):
 			self.on_top = 0
 
 		self.hiddenwnd = RSAPHiddenWnd(self)
-		self.settings_wnd = SettingsWnd(self)
 
 		self.setWindowTitle('RSAP')
 
 		if not int(l('wnd_behavior', 0)):
-			self.setFixedSize(l('initsz', g()))
+			try:
+				self.setFixedSize(l('initsz', g()))
+			except:
+				self.setFixedSize(int(l('initsz', g())[0]), int(l('initsz', g())[1]))
 		else:
-			self.resize(l('initsz', g()))
+			try:
+				self.resize(l('initsz', g()))
+			except:
+				self.resize(int(l('initsz', g())[0]), int(l('initsz', g())[1]))
 		lgr.info('Window parameters set')
 
 		self.setup_ui()
@@ -191,4 +196,9 @@ class RSAPMainWindow(QMainWindow):
 		self.step_btn.clicked.connect(self.random_engine.step)
 		self.start_btn.clicked.connect(self.random_engine.toggle)
 		self.misc_label.linkActivated.connect(self.hidebtn_clicked)
-		self.settings_btn.clicked.connect(self.settings_wnd.exec)
+		self.settings_btn.clicked.connect(self.on_settings)
+
+	def on_settings(self):
+		settings_wnd = SettingsWnd(self)
+		settings_wnd.exec()
+		del settings_wnd

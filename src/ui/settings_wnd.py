@@ -1,15 +1,16 @@
-from PySide6.QtCore import Qt, QSize, QRegularExpression, QUrl
+from PySide6.QtCore import Qt, QSize, QRegularExpression, QUrl, QStandardPaths
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox, QSpinBox
+from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox, QSpinBox, QFileDialog
 from PySide6.QtGui import QRegularExpressionValidator
 
 from core.config import DEFAULT_DATA
 from core.utils import get_settings_wnd_dimension as g, get_window_dimension as gw
-from core.settings import save as s, load as l
+from core.settings import save as s, load as l, imp, exp
 
 from ui.name_table import NameTableWidget
 
 from random import randint
+import pathlib
 import logging
 
 lgr = logging.getLogger(__name__)
@@ -56,6 +57,7 @@ class SettingsWnd(QDialog):
 
 		self.general_layout = QVBoxLayout()
 		self.general_widget.setLayout(self.general_layout)
+		self.general_layout.setSpacing(0)
 
 		self.wnd_settings = QGroupBox('Window')
 		self.wnd_layout = QVBoxLayout()
@@ -88,7 +90,10 @@ class SettingsWnd(QDialog):
 		self.initsz_wd = QLabel('Width:')
 		self.initsz_x.setMaxLength(4)
 		self.initsz_x.setValidator(QRegularExpressionValidator(QRegularExpression(r'[0-9]{1,4}'), self.initsz_x))
-		self.initsz_x.setText(str(l('initsz', gw()).width()))
+		try:
+			self.initsz_x.setText(str(l('initsz', gw()).width()))
+		except:
+			self.initsz_x.setText(str(l('initsz', gw())[0]))
 		self.wnd_initsz_layout.addWidget(self.initsz_wd)
 		self.wnd_initsz_layout.addWidget(self.initsz_x)
 
@@ -97,7 +102,10 @@ class SettingsWnd(QDialog):
 		self.initsz_y.setPlaceholderText('Height')
 		self.initsz_y.setMaxLength(4)
 		self.initsz_x.setValidator(QRegularExpressionValidator(QRegularExpression(r'[0-9]{1,4}'), self.initsz_y))
-		self.initsz_y.setText(str(l('initsz', gw()).height()))
+		try:
+			self.initsz_y.setText(str(l('initsz', gw()).height()))
+		except:
+			self.initsz_y.setText(str(l('initsz', gw())[1]))
 		self.wnd_initsz_layout.addWidget(self.initsz_he)
 		self.wnd_initsz_layout.addWidget(self.initsz_y)
 
@@ -207,8 +215,10 @@ class SettingsWnd(QDialog):
 
 		self.ie_btn = QVBoxLayout()
 		self.import_btn = QPushButton('Import')
+		self.import_btn.clicked.connect(self.import_settings)
 		self.ie_btn.addWidget(self.import_btn)
 		self.export_btn = QPushButton('Export')
+		self.export_btn.clicked.connect(self.export_settings)
 		self.ie_btn.addWidget(self.export_btn)
 		self.ie_layout.addLayout(self.ie_btn)
 
@@ -274,7 +284,27 @@ class SettingsWnd(QDialog):
 		return False
 
 	def reload_settings(self):
+		self.wnd_bg.buttons()[int(l('wnd_behavior', 0))].setChecked(True)
 		self.antirep_numspn.setRange(1, max(1, l('data', DEFAULT_DATA)['tot']))
+		self.sot_chk.setChecked(int(l('stay_on_top', 1)))
+		try:
+			self.initsz_x.setText(str(l('initsz', gw()).width()))
+		except:
+			self.initsz_x.setText(str(l('initsz', gw())[0]))
+		try:
+			self.initsz_y.setText(str(l('initsz', gw()).height()))
+		except:
+			self.initsz_y.setText(str(l('initsz', gw())[1]))
+		self.seed_type = int(l('seed_type', 0))
+		self.cur_seed = l('rand_seed', randint(0, int(1e15)))
+		self.seed_btn_changed(0)
+		self.ats_num.setValue(int(l('ats_num', 20)))
+		self.ats_time.setValue(int(l('ats_time', 100)))
+		self.antirep_enabled = int(l('antirep_enabled', 1))
+		self.antirep_num = int(l('antirep_num', int(l('data', DEFAULT_DATA)['tot']) // 2))
+		self.antirep_numspn.setRange(1, l('data', DEFAULT_DATA)['tot'])
+		self.antirep_changed(0)
+		self.name_table.set_value(dict(l('data', DEFAULT_DATA)))
 
 	def save_settings(self):
 		s('wnd_behavior', int(self.wnd_bg.buttons()[1].isChecked()))
@@ -304,3 +334,18 @@ class SettingsWnd(QDialog):
 	def ok_callback(self):
 		self.save_settings()
 		self.close()
+
+	def import_settings(self):
+		filename, _ = QFileDialog.getOpenFileName(self, 'Import settings - RSAP', str(l('stg_dir', QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation))), filter="RSAP Settings File (*.rsap)")
+		if not filename:
+			return
+		s('stg_dir', str(pathlib.Path(filename).parent))
+		imp(filename)
+		self.reload_settings()
+
+	def export_settings(self):
+		filename, _ = QFileDialog.getSaveFileName(self, 'Export settings - RSAP', str(l('stg_dir', QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation))) + '/Untitled_RSAP_Settings.rsap', filter="RSAP Settings File (*.rsap)")
+		if not filename:
+			return
+		s('stg_dir', str(pathlib.Path(filename).parent))
+		exp(filename)
