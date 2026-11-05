@@ -5,13 +5,14 @@ from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLineEdit,
 from core.utils import get_dlg_dimension as g
 
 class AddDialog(QDialog):
-	def __init__(self, parent):
+	def __init__(self, parent, default_weight):
 		super().__init__(parent)
 		self.setWindowTitle('Add person - RSAP')
 		self.setFixedSize(g())
 		self.index_edit = QLineEdit()
 		self.name_edit = QLineEdit()
 		self.weight_edit = QLineEdit()
+		self.weight_edit.setText(str(default_weight))
 		
 		self.form = QFormLayout()
 		self.form.addRow('Index: ', self.index_edit)
@@ -30,7 +31,7 @@ class AddDialog(QDialog):
 		return (self.index_edit.text(), self.name_edit.text(), self.weight_edit.text())
 
 class EditDialog(QDialog):
-	def __init__(self, parent, idxs, names, multi: bool):
+	def __init__(self, parent, idxs, names, default_weight, multi: bool):
 		super().__init__(parent)
 		self.multi = multi
 		self.setWindowTitle('Edit person - RSAP')
@@ -38,6 +39,8 @@ class EditDialog(QDialog):
 		self.index_edit = QLineEdit()
 		self.name_edit = QLineEdit()
 		self.weight_edit = QLineEdit()
+		if not multi:
+			self.weight_edit.setText(str(default_weight))
 		
 		self.form = QFormLayout()
 		self.form.addRow('Index: ', self.index_edit)

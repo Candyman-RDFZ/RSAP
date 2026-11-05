@@ -185,6 +185,7 @@ class RSAPMainWindow(QMainWindow):
 		self.name_label.setText(str(name))
 		self.nn_widget.setToolTip(f'No. {idx}; Name: {name}; Weight: {weight}; Chance: {chance:.2f}%')
 		self.name_label.home(False)
+		self.number_label.home(False)
 
 	def connect_signals(self):
 		self.step_btn.clicked.connect(self.random_engine.step)

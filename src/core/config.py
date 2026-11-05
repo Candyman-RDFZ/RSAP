@@ -12,4 +12,7 @@ ID = 'io.github.Candyman-RDFZ.RSAP'
 PLATFORM = platform.system()
 
 EXEC = getattr(sys, 'frozen', False)
-DIR_ROOT = sys._MEIPASS if EXEC else pathlib.Path(__file__).parents[1]
+ASSETS_ROOT = (pathlib.Path(sys._MEIPASS) if EXEC else pathlib.Path(__file__).parents[1]) / 'assets'
+ROOT = pathlib.Path(__file__).parents[1]
+
+DEFAULT_DATA = {'tot': 0, 'tot_weight': 0}

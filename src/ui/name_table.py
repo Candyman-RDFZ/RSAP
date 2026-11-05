@@ -45,10 +45,10 @@ class NameTableWidget(QTableWidget):
 		self.del_button.setEnabled(bool(sel_rows))
 		self.edit_button.setEnabled(bool(sel_rows))
 
-	def verify_data(self, index, name, weight, multi=False) -> bool:
+	def verify_data(self, row, index, name, weight, multi=False) -> bool:
 		if not multi:
 			for i in range(self.tot):
-				if self.item(i, 0).text() == index:
+				if self.item(i, 0).text() == index and i != row:
 					QMessageBox.critical(self.parent, 'Error - RSAP', f'The index ({index}) cannot be the same as No. {index} (Name: {self.item(i, 1).text()}; Weight: {self.item(i, 2).text()}).', buttons=QMessageBox.Ok)
 					return False
 		if weight == '':
@@ -67,13 +67,13 @@ class NameTableWidget(QTableWidget):
 				self.setItem(i, 3, QTableWidgetItem('/'))
 
 	def add_row(self):
-		dialog = AddDialog(self.parent)
+		dialog = AddDialog(self.parent, 1)
 		if dialog.exec() != QDialog.Accepted:
 			return None
 		index, name, weight = dialog.values()
 		weight = int(weight)
 		
-		if not self.verify_data(index, name, weight):
+		if not self.verify_data(-1, index, name, weight, multi=True):
 			return
 
 		self.insertRow(self.tot)
@@ -95,22 +95,22 @@ class NameTableWidget(QTableWidget):
 		weights = [self.item(row, 2).text() for row in rows]
 		multi = len(rows) != 1
 
-		dialog = EditDialog(self.parent, idxs, names, multi)
+		dialog = EditDialog(self.parent, idxs, names, 1, multi)
 		if dialog.exec() != QDialog.Accepted:
 			return None
 		values = dialog.values()
 
 		if multi:
-			if not self.verify_data(None, None, int(values), True):
+			if not self.verify_data(-1, None, None, int(values), True):
 				return
 			for row in rows:
 				pre = self.item(row, 2).text()
 				self.setItem(row, 2, QTableWidgetItem(str(values)))
 				self.tot_weight -= int(pre) - int(values)
 		else:
-			if not self.verify_data(values[0], values[1], values[2]):
-				return
 			row = rows[0]
+			if not self.verify_data(row, values[0], values[1], values[2]):
+				return
 			self.setItem(row, 0, QTableWidgetItem(values[0]))
 			self.setItem(row, 1, QTableWidgetItem(values[1]))
 			pre = self.item(row, 2).text()
@@ -205,9 +205,14 @@ class NameTableWidget(QTableWidget):
 				self.setItem(i, 0, QTableWidgetItem(index))
 				self.setItem(i, 1, QTableWidgetItem(name))
 				self.setItem(i, 2, QTableWidgetItem(str(weight)))
-				self.setItem(i, 3, QTableWidgetItem(f'{(weight / self.tot_weight * 100):.2f}%'))
+				if self.tot_weight != 0:
+					self.setItem(i, 3, QTableWidgetItem(f'{(weight / self.tot_weight * 100):.2f}%'))
+				else:
+					self.setItem(i, 3, QTableWidgetItem('/'))
 		except Exception as e:
+			print(e)
 			dialog = QMessageBox.critical(self.parent, 'Error - RSAP', 'Cannot load data from settings.', buttons=QMessageBox.Ok)
 			self.clearContents()
 			self.setRowCount(0)
 			self.tot = 0
+			self.tot_weight = 0

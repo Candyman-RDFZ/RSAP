@@ -43,7 +43,7 @@ elif PLATFORM == 'Linux':
 app = QApplication([])
 app.setApplicationName(NAME)
 app.setOrganizationName(ORG)
-app.setWindowIcon(QIcon(p('assets/icon.png')))
+app.setWindowIcon(QIcon(p('icon.png')))
 
 lgr.info('Created application')
 

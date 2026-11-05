@@ -4,7 +4,7 @@ import logging
 from .fmts import ColoredFormatter, IndentedFormatter
 from core.utils import sanitize_path as p
 
-def setup_logging(logfile=p('RSAP.log'), level=logging.INFO):
+def setup_logging(logfile=p('RSAP.log', False), level=logging.INFO):
 	logger = logging.getLogger()
 	logger.setLevel(level)
 

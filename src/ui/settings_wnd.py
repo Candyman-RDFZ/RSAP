@@ -3,6 +3,7 @@ from PySide6.QtGui import QDesktopServices
 from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox, QSpinBox
 from PySide6.QtGui import QRegularExpressionValidator
 
+from core.config import DEFAULT_DATA
 from core.utils import get_settings_wnd_dimension as g, get_window_dimension as gw
 from core.settings import save as s, load as l
 
@@ -180,9 +181,9 @@ class SettingsWnd(QDialog):
 		self.antirep_lbl = QLabel('Do not repeat for ')
 		self.antirep_layout.addWidget(self.antirep_lbl)
 
-		self.antirep_num = int(l('data', {'tot': 0, 'tot_weight': 0})['tot'] ) // 2
+		self.antirep_num = int(l('antirep_num', int(l('data', DEFAULT_DATA)['tot']) // 2))
 		self.antirep_numspn = QSpinBox()
-		self.antirep_numspn.setRange(1, l('data', {'tot': 0, 'tot_weight': 0})['tot'])
+		self.antirep_numspn.setRange(1, l('data', DEFAULT_DATA)['tot'])
 		self.antirep_numspn.setSingleStep(1)
 		self.antirep_numspn.setValue(self.antirep_num if self.antirep_enabled else 1)
 		self.antirep_numspn.setSuffix(' person(s)')
@@ -238,7 +239,7 @@ class SettingsWnd(QDialog):
 		self.btns_layout.addWidget(self.del_btn, alignment=Qt.AlignmentFlag.AlignTop)
 
 		self.name_table = NameTableWidget(self.add_btn, self.edit_btn, self.del_btn, self)
-		self.name_table.set_value(dict(l('data', {'tot': 0, 'tot_weight': 0})))
+		self.name_table.set_value(dict(l('data', DEFAULT_DATA)))
 		self.name_layout.addWidget(self.name_table, stretch=1)
 		self.name_layout.addWidget(self.btns_widget, alignment=Qt.AlignmentFlag.AlignTop)
 
@@ -272,6 +273,9 @@ class SettingsWnd(QDialog):
 		QMessageBox.critical(self, 'Error', 'The initial size must be between 100x100 and 2000x2000.')
 		return False
 
+	def reload_settings(self):
+		self.antirep_numspn.setRange(1, max(1, l('data', DEFAULT_DATA)['tot']))
+
 	def save_settings(self):
 		s('wnd_behavior', int(self.wnd_bg.buttons()[1].isChecked()))
 		s('stay_on_top', int(self.sot_chk.isChecked()))
@@ -289,10 +293,11 @@ class SettingsWnd(QDialog):
 		s('ats_time', self.ats_time.value())
 
 		s('antirep_enabled', int(self.antirep_enabled))
-		s('antirep_num', self.antirep_num)
+		s('antirep_num', self.antirep_numspn.value())
 
 		s('data', self.name_table.get_value())
 
+		self.reload_settings()
 		self.parent.reload_settings()
 		self.parent.random_engine.reload_settings()
 	

@@ -39,9 +39,8 @@ class RandomEngine:
 		self.upd_btns()
 	
 	def upd_btns(self):
-		if not self.pool:
-			self.parent_wnd.step_btn.setEnabled(False)
-			self.parent_wnd.start_btn.setEnabled(False)
+		self.parent_wnd.step_btn.setEnabled(bool(self.pool))
+		self.parent_wnd.start_btn.setEnabled(bool(self.pool))
 
 	def reload_settings(self):
 		self.seed_type = int(l('seed_type', 0))
@@ -56,13 +55,17 @@ class RandomEngine:
 		self.antirep = int(l('antirep_enabled', 1))
 		self.antirep_num = int(l('antirep_num', len(self.data) // 2))
 		self.data = dict(l('data', {'tot': 0, 'tot_weight': 0}))
+		self.tot = self.data['tot']
+		self.tot_weight = self.data['tot_weight']
 		self.pool = self.build_pool()
 		self.antirep_queue = []
+
 		self.upd_btns()
 		lgr.info('Random engine settings reloaded')
 
 	def log_data(self):
 		self.data_str = f'Data:\nTotal: {self.tot}'
+		if self.tot == 0 or self.tot_weight == 0: return
 		for i in range(self.tot):
 			cur_data = self.data[i]
 			cur_chance = cur_data['weight'] / self.tot_weight * 100
@@ -72,6 +75,8 @@ class RandomEngine:
 
 	def build_pool(self) -> list:
 		res = []
+		if self.tot == 0:
+			return []
 		for i in range(self.tot):
 			cur_weight = self.data[i]['weight']
 			for j in range(cur_weight):
@@ -89,10 +94,16 @@ class RandomEngine:
 
 	def process_antirep(self, idx):
 		self.antirep_queue.append(idx)
+		lgr.info(f'Added item {idx} to the anti-repetition queue')
 		self.rem_from_pool(idx)
+		lgr.info(f'Removed item {idx} from the pool')
+		lgr.info(f'Current pool: {self.pool}')
 		if len(self.antirep_queue) == min(self.antirep_num, self.tot):
 			popped = self.antirep_queue.pop(0)
+			lgr.info(f'Anti-repetition queue full. Removed item {popped} from the anti-repetition queue')
 			self.add_to_pool(popped)
+			lgr.info(f'Re-added item {popped} to the pool')
+			lgr.info(f'Current pool: {self.pool}')
 
 	def _step(self) -> tuple:
 		cur = self.rng.choice(self.pool)
