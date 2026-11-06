@@ -40,6 +40,7 @@ class EditDialog(QDialog):
 		self.index_edit = QLineEdit()
 		self.name_edit = QLineEdit()
 		self.weight_edit = QSpinBox()
+		self.weight_edit.setMinimum(0)
 		if not multi:
 			self.weight_edit.setValue(int(default_weight))
 		

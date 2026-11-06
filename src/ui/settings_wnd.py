@@ -89,26 +89,25 @@ class SettingsWnd(QDialog):
 		self.initsz_lbl = QLabel('Initial size:')
 		self.wnd_initsz_layout.addWidget(self.initsz_lbl)
 
-		self.initsz_x = QLineEdit()
+		self.initsz_x = QSpinBox()
+		self.initsz_x.setRange(100, 2000)
+		self.initsz_x.setSuffix(' px')
 		self.initsz_wd = QLabel('Width:')
-		self.initsz_x.setMaxLength(4)
-		self.initsz_x.setValidator(QRegularExpressionValidator(QRegularExpression(r'[0-9]{1,4}'), self.initsz_x))
 		try:
-			self.initsz_x.setText(str(l('initsz', gw()).width()))
+			self.initsz_x.setValue(int(l('initsz', gw()).width()))
 		except:
-			self.initsz_x.setText(str(l('initsz', gw())[0]))
+			self.initsz_x.setValue(int(l('initsz', gw())[0]))
 		self.wnd_initsz_layout.addWidget(self.initsz_wd)
 		self.wnd_initsz_layout.addWidget(self.initsz_x)
 
-		self.initsz_y = QLineEdit()
+		self.initsz_y = QSpinBox()
+		self.initsz_y.setRange(100, 2000)
+		self.initsz_y.setSuffix(' px')
 		self.initsz_he = QLabel('Height:')
-		self.initsz_y.setPlaceholderText('Height')
-		self.initsz_y.setMaxLength(4)
-		self.initsz_x.setValidator(QRegularExpressionValidator(QRegularExpression(r'[0-9]{1,4}'), self.initsz_y))
 		try:
-			self.initsz_y.setText(str(l('initsz', gw()).height()))
+			self.initsz_y.setValue(int(l('initsz', gw()).height()))
 		except:
-			self.initsz_y.setText(str(l('initsz', gw())[1]))
+			self.initsz_y.setValue(int(l('initsz', gw())[1]))
 		self.wnd_initsz_layout.addWidget(self.initsz_he)
 		self.wnd_initsz_layout.addWidget(self.initsz_y)
 
@@ -278,27 +277,19 @@ class SettingsWnd(QDialog):
 			self.antirep_numspn.setValue(1)
 		self.antirep_numspn.setEnabled(self.antirep_enabled)
 
-	def chk_initsz(self) -> bool:
-		self.sz_x = int(self.initsz_x.text())
-		self.sz_y = int(self.initsz_y.text())
-		if 100 <= self.sz_x <= 2000 and 100 <= self.sz_y <= 2000:
-			return True
-		QMessageBox.critical(self, 'Error', 'The initial size must be between 100x100 and 2000x2000.')
-		return False
-
 	def reload_settings(self):
 		self.tabs.setCurrentIndex(0)
 		self.wnd_btns[int(l('wnd_behavior', 0))].setChecked(True)
 		self.antirep_numspn.setRange(1, max(1, l('data', DEFAULT_DATA)['tot']))
 		self.sot_chk.setChecked(int(l('stay_on_top', 1)))
 		try:
-			self.initsz_x.setText(str(l('initsz', gw()).width()))
+			self.initsz_x.setValue(int(l('initsz', gw()).width()))
 		except:
-			self.initsz_x.setText(str(l('initsz', gw())[0]))
+			self.initsz_x.setValue(int(l('initsz', gw())[0]))
 		try:
-			self.initsz_y.setText(str(l('initsz', gw()).height()))
+			self.initsz_y.setValue(int(l('initsz', gw()).height()))
 		except:
-			self.initsz_y.setText(str(l('initsz', gw())[1]))
+			self.initsz_y.setValue(int(l('initsz', gw())[1]))
 		self.seed_type = int(l('seed_type', 0))
 		self.cur_seed = l('rand_seed', randint(0, int(1e15)))
 		self.seed_btn_changed(0)
@@ -313,10 +304,8 @@ class SettingsWnd(QDialog):
 	def save_settings(self):
 		s('wnd_behavior', int(self.wnd_btns[1].isChecked()))
 		s('stay_on_top', int(self.sot_chk.isChecked()))
-		
-		if not self.chk_initsz():
-			return
-		s('initsz', QSize(int(self.initsz_x.text()), int(self.initsz_y.text())))
+
+		s('initsz', QSize(int(self.initsz_x.value()), int(self.initsz_y.value())))
 
 		s('seed_type', int(self.seed_btns[1].isChecked()))
 		if self.seed_type:

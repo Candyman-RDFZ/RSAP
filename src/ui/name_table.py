@@ -74,7 +74,7 @@ class NameTableWidget(QTableWidget):
 		index, name, weight = dialog.values()
 		weight = int(weight)
 		
-		if not self.verify_data(-1, index, name, weight, multi=True):
+		if not self.verify_data(-1, index, name, weight):
 			return
 
 		self.insertRow(self.tot)
