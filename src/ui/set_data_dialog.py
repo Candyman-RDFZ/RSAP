@@ -1,6 +1,6 @@
 """A custom dialog when the user clickes the add/edit buttons on the start page."""
 
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout, QSpinBox
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout, QSpinBox, QLayout
 
 from core.utils import get_dlg_dimension as g
 
@@ -27,6 +27,8 @@ class AddDialog(QDialog):
 		self.layout.addLayout(self.form)
 		self.layout.addWidget(self.buttons)
 		self.setLayout(self.layout)
+
+		self.layout.setSizeConstraint(QLayout.SetFixedSize)
 	
 	def values(self) -> tuple:
 		return (self.index_edit.text(), self.name_edit.text(), self.weight_edit.value())
@@ -64,6 +66,8 @@ class EditDialog(QDialog):
 		self.layout.addLayout(self.form)
 		self.layout.addWidget(self.buttons)
 		self.setLayout(self.layout)
+
+		self.layout.setSizeConstraint(QLayout.SetFixedSize)
 	
 	def values(self):
 		if self.multi:

@@ -1,6 +1,6 @@
-from PySide6.QtCore import Qt, QSize, QRegularExpression, QUrl, QStandardPaths
+from PySide6.QtCore import Qt, QSize, QRegularExpression, QUrl, QStandardPaths, QTimer
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox, QSpinBox, QFileDialog
+from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox, QSpinBox, QFileDialog, QLayout
 from PySide6.QtGui import QRegularExpressionValidator
 
 from core.config import DEFAULT_DATA
@@ -24,6 +24,7 @@ class SettingsWnd(QDialog):
 
 		self.setFixedSize(g())
 		self.setWindowTitle('Settings - RSAP')
+		self.on_top = self.parent.on_top
 
 		self.layout = QVBoxLayout(self)
 
@@ -97,8 +98,8 @@ class SettingsWnd(QDialog):
 			self.initsz_x.setValue(int(l('initsz', gw()).width()))
 		except:
 			self.initsz_x.setValue(int(l('initsz', gw())[0]))
-		self.wnd_initsz_layout.addWidget(self.initsz_wd)
-		self.wnd_initsz_layout.addWidget(self.initsz_x)
+		self.wnd_initsz_layout.addWidget(self.initsz_wd, alignment=Qt.AlignmentFlag.AlignLeft)
+		self.wnd_initsz_layout.addWidget(self.initsz_x, alignment=Qt.AlignmentFlag.AlignLeft)
 
 		self.initsz_y = QSpinBox()
 		self.initsz_y.setRange(100, 2000)
@@ -108,8 +109,9 @@ class SettingsWnd(QDialog):
 			self.initsz_y.setValue(int(l('initsz', gw()).height()))
 		except:
 			self.initsz_y.setValue(int(l('initsz', gw())[1]))
-		self.wnd_initsz_layout.addWidget(self.initsz_he)
-		self.wnd_initsz_layout.addWidget(self.initsz_y)
+		self.wnd_initsz_layout.addWidget(self.initsz_he, alignment=Qt.AlignmentFlag.AlignLeft)
+		self.wnd_initsz_layout.addWidget(self.initsz_y, alignment=Qt.AlignmentFlag.AlignLeft)
+		self.wnd_initsz_layout.addStretch()
 
 		self.wnd_layout.addLayout(self.wnd_initsz_layout)
 
@@ -145,9 +147,6 @@ class SettingsWnd(QDialog):
 
 		self.seed_warn = QLabel('<b>Warning</b>: Only use custom seeds for testing purposes. Setting a custom seed will cause the program to generate the same selection sequence each time.')
 		self.seed_warn.setWordWrap(True)
-		tmp_font = self.seed_warn.font()
-		tmp_font.setPointSize(self.height() // 80)
-		self.seed_warn.setFont(tmp_font)
 		self.seed_layout_.addWidget(self.seed_warn)
 
 		self.autostop_settings = QGroupBox('Auto Stop')
@@ -203,7 +202,6 @@ class SettingsWnd(QDialog):
 		self.antirep_layout.addWidget(self.antirep_numspn)
 
 		self.antirep_note = QLabel('<b>Note</b>: Setting 1 is the same as disabling.')
-		self.antirep_note.setFont(tmp_font)
 		self.antirep_layout_.addWidget(self.antirep_note)
 
 		self.ie_settings = QGroupBox('Import/Export')
@@ -257,6 +255,8 @@ class SettingsWnd(QDialog):
 
 		self.name_layout_.addWidget(self.name_wdg, stretch=1)
 
+		self.layout.setSizeConstraint(QLayout.SetFixedSize)
+
 	def seed_btn_changed(self, button_id):
 		self.seed_type = self.seed_btns[1].isChecked()
 		if self.seed_type:
@@ -277,8 +277,9 @@ class SettingsWnd(QDialog):
 			self.antirep_numspn.setValue(1)
 		self.antirep_numspn.setEnabled(self.antirep_enabled)
 
-	def reload_settings(self):
-		self.tabs.setCurrentIndex(0)
+	def reload_settings(self, soft=False):
+		if not soft:
+			self.tabs.setCurrentIndex(0)
 		self.wnd_btns[int(l('wnd_behavior', 0))].setChecked(True)
 		self.antirep_numspn.setRange(1, max(1, l('data', DEFAULT_DATA)['tot']))
 		self.sot_chk.setChecked(int(l('stay_on_top', 1)))
@@ -301,7 +302,7 @@ class SettingsWnd(QDialog):
 		self.antirep_changed(0)
 		self.name_table.set_value(dict(l('data', DEFAULT_DATA)))
 
-	def save_settings(self):
+	def save_settings(self, ok=False):
 		s('wnd_behavior', int(self.wnd_btns[1].isChecked()))
 		s('stay_on_top', int(self.sot_chk.isChecked()))
 
@@ -320,16 +321,25 @@ class SettingsWnd(QDialog):
 
 		s('data', self.name_table.get_value())
 
-		self.reload_settings()
+		self.reload_settings(True)
 		self.parent.reload_settings()
 		self.parent.random_engine.reload_settings()
+		if not ok:
+			if self.on_top != int(l('stay_on_top', 1)):
+				self.on_top = int(l('stay_on_top', 1))
+				self.setWindowFlag(Qt.WindowStaysOnTopHint, self.on_top)
+				self.on_top = int(l('stay_on_top', 1))
+				self.close()
+				QTimer.singleShot(0, self.parent.upd_wndflags)
+				QTimer.singleShot(0, self.parent.on_settings)
 	
 	def open_help(self):
 		QDesktopServices.openUrl(QUrl('https://candyman33.cc/p/RSAP/h/'))
 
 	def ok_callback(self):
-		self.save_settings()
+		self.save_settings(True)
 		self.close()
+		QTimer.singleShot(0, self.parent.upd_wndflags)
 
 	def import_settings(self):
 		filename, _ = QFileDialog.getOpenFileName(self, 'Import settings - RSAP', str(l('stg_dir', QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation))), filter="RSAP Settings File (*.rsap)")

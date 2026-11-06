@@ -136,15 +136,18 @@ class RSAPMainWindow(QMainWindow):
 		self.main_layout.setSpacing(0)
 		self.setCentralWidget(self.main_widget)
 
-	def reload_settings(self):
+	def upd_wndflags(self):
 		if int(l('stay_on_top', 1)) and not self.on_top:
-			self.setWindowFlags(Qt.WindowStaysOnTopHint)
+			self.setWindowFlag(Qt.WindowStaysOnTopHint, True)
 			self.on_top = 1
 		if not int(l('stay_on_top', 1)) and self.on_top:
-			self.setWindowFlags(Qt.Window)
+			self.setWindowFlag(Qt.WindowStaysOnTopHint, False)
 			self.on_top = 0
 
 		self.show()
+		lgr.info('Main window flags updated')
+
+	def reload_settings(self):
 		if not int(l('wnd_behavior', 0)):
 			self.setFixedSize(l('initsz', g()))
 		else:
