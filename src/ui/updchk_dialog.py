@@ -15,6 +15,11 @@ class UpdchkDialog(QMessageBox):
 		self.abort_btn.clicked.connect(self.abort)
 		self.addButton(self.abort_btn, QMessageBox.ButtonRole.RejectRole)
 
+	def reload_lang(self):
+		self.setWindowTitle(tr('updchk_chk') + ' - RSAP')
+		self.setText(tr('updchk_chking'))
+		self.abort_btn.setText(tr('updchk_abrt'))
+
 	def closeEvent(self, event):
 		event.ignore()
 

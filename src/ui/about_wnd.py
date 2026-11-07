@@ -45,6 +45,7 @@ class RSAPAboutWnd(QDialog):
 
 	def reload_lang(self):
 		self.lbl.setText(tr('about_text', ver=VERSION))
+		self.updchk_dialog.reload_lang()
 
 	def on_click(self, link):
 		if link != 'chkupd':
