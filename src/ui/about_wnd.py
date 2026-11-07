@@ -6,6 +6,7 @@ from core.config import VERSION, FULL_NAME
 from core.utils import get_about_wnd_dimension as g
 from core.utils import sanitize_path as p
 from core.update_checker import UpdateChecker
+from ui.updchk_dialog import UpdchkDialog
 
 import json
 
@@ -16,7 +17,11 @@ class RSAPAboutWnd(QDialog):
 
 		self.setWindowTitle('About RSAP')
 		self.setFixedSize(g())
-		self.updchk = UpdateChecker(self.parent)
+
+		self.updchk_dialog = UpdchkDialog(self)
+		self.updchk = UpdateChecker(self)
+		self.updchk.finished.connect(self.on_finished)
+		self.updchk.error.connect(self.on_error)
 
 		self.layout = QVBoxLayout()
 
@@ -41,19 +46,11 @@ class RSAPAboutWnd(QDialog):
 		if link != 'chkupd':
 			QDesktopServices.openUrl(QUrl(link))
 			return
-		self.updchk.chk(self.on_finished)
+		self.updchk_dialog.show()
+		self.updchk.chk()
 
 	def on_finished(self, text):
-		if text == -1:
-			dialog = QMessageBox(self.parent)
-			dialog.setWindowTitle('Error - RSAP')
-			dialog.setText('<p>Failed to check for updates. Please check your internet connection, and try again.</p><p>If you believe the problem is not with your internet, please contact me at dckx18@gmail.com</p>')
-			dialog.setIcon(QMessageBox.Critical)
-			dialog.setStandardButtons(QMessageBox.Ok | QMessageBox.Retry)
-			res = dialog.exec()
-			if res == QMessageBox.Retry:
-				self.updchk.chk(self.on_finished)
-			return
+		self.updchk_dialog.force_close()
 		text = json.loads(text)
 		ver = text['ver']
 		if ver == VERSION:
@@ -68,3 +65,14 @@ class RSAPAboutWnd(QDialog):
 		res = dialog.exec()
 		if res == QMessageBox.Open:
 			QDesktopServices.openUrl(QUrl(f'https://candyman33.cc/p/RSAP/d/{ver}/'))
+
+	def on_error(self, text):
+		self.updchk_dialog.force_close()
+		dialog = QMessageBox(self)
+		dialog.setWindowTitle('Error - RSAP')
+		dialog.setText(f'<p>Failed to check for updates. Please check your internet connection, and try again.</p><p>Error string: {text}</p>')
+		dialog.setIcon(QMessageBox.Critical)
+		dialog.setStandardButtons(QMessageBox.Ok | QMessageBox.Retry)
+		res = dialog.exec()
+		if res == QMessageBox.Retry:
+			self.updchk.chk()
