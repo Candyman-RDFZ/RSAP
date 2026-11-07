@@ -1,5 +1,6 @@
 from PySide6.QtCore import QTimer
 
+from core.translator import tr
 from .settings import load as l
 
 from random import Random, randint
@@ -39,8 +40,10 @@ class RandomEngine:
 		self.upd_btns()
 	
 	def upd_btns(self):
-		self.parent_wnd.step_btn.setEnabled(bool(self.pool))
+		self.parent_wnd.step_btn.setEnabled(bool(self.pool) and not self.stop_timer.isActive())
 		self.parent_wnd.start_btn.setEnabled(bool(self.pool))
+
+	def reload_lang(self): pass
 
 	def reload_settings(self):
 		self.seed_type = int(l('seed_type', 0))
@@ -122,7 +125,7 @@ class RandomEngine:
 		if started:
 			self._stop_cnt -= 1
 			lgr.info(f'Stop count is now {self._stop_cnt}')
-			self.parent_wnd.start_btn.setText(f'Stop\n{self._stop_cnt} left')
+			self.parent_wnd.start_btn.setText(tr('mainwnd_stop', stop_cnt=self._stop_cnt))
 			if self._stop_cnt == 0:
 				self.stop()
 
@@ -135,12 +138,12 @@ class RandomEngine:
 	def stop(self):
 		self.stop_timer.stop()
 		self._stop_cnt = self.stop_cnt
-		self.parent_wnd.start_btn.setText('Start')
+		self.parent_wnd.start_btn.setText(tr('mainwnd_start'))
 		self.parent_wnd.step_btn.setEnabled(True)
 		lgr.info('Stopped')
 
 	def start(self):
-		self.parent_wnd.start_btn.setText(f'Stop\n{self.stop_cnt} left')
+		self.parent_wnd.start_btn.setText(tr('mainwnd_stop', stop_cnt=self.stop_cnt))
 		self.parent_wnd.step_btn.setEnabled(False)
 		self._stop_cnt = self.stop_cnt
 		self._start()

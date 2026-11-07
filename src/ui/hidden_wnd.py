@@ -2,6 +2,7 @@ from PySide6.QtCore import Qt
 from PySide6.QtWidgets import QPushButton
 
 from core.utils import get_hidewnd_dimension, get_hidewnd_pos
+from core.translator import tr
 
 import logging
 
@@ -9,7 +10,7 @@ lgr = logging.getLogger(__name__)
 
 class RSAPHiddenWnd(QPushButton):
 	def __init__(self, parent):
-		super().__init__('Show')
+		super().__init__(tr('hidewnd_text'))
 		lgr.info('Hidden window initiated')
 		self.setWindowFlags(Qt.FramelessWindowHint | Qt.WindowStaysOnTopHint)
 		self.setFixedSize(get_hidewnd_dimension())

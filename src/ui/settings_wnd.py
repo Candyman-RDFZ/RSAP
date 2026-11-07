@@ -1,11 +1,12 @@
 from PySide6.QtCore import Qt, QSize, QRegularExpression, QUrl, QStandardPaths, QTimer
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox, QSpinBox, QFileDialog, QLayout
+from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox, QSpinBox, QFileDialog, QLayout, QComboBox
 from PySide6.QtGui import QRegularExpressionValidator
 
 from core.config import DEFAULT_DATA
 from core.utils import get_settings_wnd_dimension as g, get_window_dimension as gw
 from core.settings import save as s, load as l, imp, exp
+from core.translator import tr, upd_lang
 
 from ui.name_table import NameTableWidget
 
@@ -23,7 +24,7 @@ class SettingsWnd(QDialog):
 		lgr.info('Settings window initiated.')
 
 		self.setFixedSize(g())
-		self.setWindowTitle('Settings - RSAP')
+		self.setWindowTitle(tr('stgwnd_title'))
 		self.on_top = self.parent.on_top
 
 		self.layout = QVBoxLayout(self)
@@ -31,19 +32,23 @@ class SettingsWnd(QDialog):
 		self.tabs = QTabWidget()
 		self.general_widget = QWidget()
 		self.name_widget = QWidget()
-		self.tabs.addTab(self.general_widget, 'General')
-		self.tabs.addTab(self.name_widget, 'Names && Chances')
+		self.tabs.addTab(self.general_widget, tr('stgwnd_general'))
+		self.tabs.addTab(self.name_widget, tr('stgwnd_nc'))
 		self.tabs.setCurrentIndex(0)
 		self.layout.addWidget(self.tabs)
 
 		self.buttons_layout = QHBoxLayout()
 
-		self.ok = QPushButton('OK')
-		self.cancel = QPushButton('Cancel')
-		self.apply = QPushButton('Apply')
-		self.help = QPushButton('Help')
+		self.ok = QPushButton(tr('stgwnd_ok'))
+		self.cancel = QPushButton(tr('stgwnd_cancel'))
+		self.apply = QPushButton(tr('stgwnd_apply'))
+		self.help = QPushButton(tr('stgwnd_help'))
+		self.lang = QComboBox()
+		self.lang.addItems(['English', '简体中文', '繁體中文'])
+		self.lang.setCurrentIndex(int(l('lang', 0)))
 
 		self.buttons_layout.addWidget(self.help, alignment=Qt.AlignmentFlag.AlignLeft)
+		self.buttons_layout.addWidget(self.lang, alignment=Qt.AlignmentFlag.AlignLeft)
 		self.buttons_layout.addStretch()
 		self.buttons_layout.addWidget(self.ok, alignment=Qt.AlignmentFlag.AlignRight)
 		self.buttons_layout.addWidget(self.cancel, alignment=Qt.AlignmentFlag.AlignRight)
@@ -61,25 +66,25 @@ class SettingsWnd(QDialog):
 		self.general_widget.setLayout(self.general_layout)
 		self.general_layout.setSpacing(0)
 
-		self.wnd_settings = QGroupBox('Window')
+		self.wnd_settings = QGroupBox(tr('stgwnd_wnd'))
 		self.wnd_layout = QVBoxLayout()
 		self.wnd_settings.setLayout(self.wnd_layout)
 		self.general_layout.addWidget(self.wnd_settings)
 		
 		self.wnd_behavior_layout = QHBoxLayout()
-		self.wnd_behavior = QLabel('Behavior: ')
+		self.wnd_behavior = QLabel(tr('stgwnd_bhv'))
 		self.wnd_behavior_layout.addWidget(self.wnd_behavior)
 		self.wnd_bg = QButtonGroup()
 		self.wnd_btns = []
 
-		for txt in ['Fixed', 'Resizable']:
-			rb = QRadioButton(txt)
+		for txt in ['stgwnd_fixed', 'stgwnd_rsz']:
+			rb = QRadioButton(tr(txt))
 			self.wnd_bg.addButton(rb)
 			self.wnd_behavior_layout.addWidget(rb)
 			self.wnd_btns.append(rb)
 		self.wnd_btns[int(l('wnd_behavior', 0))].setChecked(True)
 		self.wnd_behavior_layout.addStretch()
-		self.sot_chk = QCheckBox('Stay on top')
+		self.sot_chk = QCheckBox(tr('stgwnd_sot'))
 		self.sot_chk.setChecked(int(l('stay_on_top', 1)))
 		self.wnd_behavior_layout.addWidget(self.sot_chk)
 
@@ -87,13 +92,13 @@ class SettingsWnd(QDialog):
 		self.wnd_layout.addLayout(self.wnd_behavior_layout)
 
 		self.wnd_initsz_layout = QHBoxLayout()
-		self.initsz_lbl = QLabel('Initial size:')
+		self.initsz_lbl = QLabel(tr('stgwnd_initsz'))
 		self.wnd_initsz_layout.addWidget(self.initsz_lbl)
 
 		self.initsz_x = QSpinBox()
 		self.initsz_x.setRange(100, 2000)
-		self.initsz_x.setSuffix(' px')
-		self.initsz_wd = QLabel('Width:')
+		self.initsz_x.setSuffix(tr('stgwnd_px'))
+		self.initsz_wd = QLabel(tr('stgwnd_w'))
 		try:
 			self.initsz_x.setValue(int(l('initsz', gw()).width()))
 		except:
@@ -103,8 +108,8 @@ class SettingsWnd(QDialog):
 
 		self.initsz_y = QSpinBox()
 		self.initsz_y.setRange(100, 2000)
-		self.initsz_y.setSuffix(' px')
-		self.initsz_he = QLabel('Height:')
+		self.initsz_y.setSuffix(tr('stgwnd_px'))
+		self.initsz_he = QLabel(tr('stgwnd_h'))
 		try:
 			self.initsz_y.setValue(int(l('initsz', gw()).height()))
 		except:
@@ -115,13 +120,13 @@ class SettingsWnd(QDialog):
 
 		self.wnd_layout.addLayout(self.wnd_initsz_layout)
 
-		self.seed_settings = QGroupBox('Seed')
+		self.seed_settings = QGroupBox(tr('stgwnd_seed'))
 		self.seed_layout_ = QVBoxLayout()
 		self.seed_layout = QHBoxLayout()
 		self.seed_settings.setLayout(self.seed_layout_)
 		self.general_layout.addWidget(self.seed_settings)
 
-		self.seed_type_lbl = QLabel('Type:')
+		self.seed_type_lbl = QLabel(tr('stgwnd_type'))
 		self.seed_layout.addWidget(self.seed_type_lbl)
 
 		self.seed_bg = QButtonGroup()
@@ -129,8 +134,8 @@ class SettingsWnd(QDialog):
 		self.cur_seed = l('rand_seed', randint(0, int(1e15)))
 		self.seed_btns = []
 
-		for txt in ['Random', 'Custom']:
-			rb = QRadioButton(txt)
+		for txt in ['stgwnd_rand', 'stgwnd_cst']:
+			rb = QRadioButton(tr(txt))
 			self.seed_bg.addButton(rb)
 			self.seed_layout.addWidget(rb)
 			self.seed_btns.append(rb)
@@ -139,26 +144,26 @@ class SettingsWnd(QDialog):
 
 		self.seed_entry = QLineEdit()
 		self.seed_entry.setValidator(QRegularExpressionValidator(QRegularExpression(r'[0-9]{1,15}'), self.seed_entry))
-		self.seed_entry.setText(str(self.cur_seed) if self.seed_type else '<Random>')
+		self.seed_entry.setText(str(self.cur_seed) if self.seed_type else tr('stgwnd__rand'))
 		self.seed_entry.setEnabled(self.seed_type)
 		self.seed_layout.addWidget(self.seed_entry)
 
 		self.seed_layout_.addLayout(self.seed_layout)
 
-		self.seed_warn = QLabel('<b>Warning</b>: Only use custom seeds for testing purposes. Setting a custom seed will cause the program to generate the same selection sequence each time.')
+		self.seed_warn = QLabel(tr('stgwnd_seedwarn'))
 		self.seed_warn.setWordWrap(True)
 		self.seed_layout_.addWidget(self.seed_warn)
 
-		self.autostop_settings = QGroupBox('Auto Stop')
+		self.autostop_settings = QGroupBox(tr('stgwnd_ats'))
 		self.autostop_layout = QVBoxLayout()
 		self.autostop_settings.setLayout(self.autostop_layout)
 		self.general_layout.addWidget(self.autostop_settings)
 
 		self.ats_num_layout = QHBoxLayout()
-		self.ats_num_lbl = QLabel('Auto stop after selecting ')
+		self.ats_num_lbl = QLabel(tr('stgwnd_pp'))
 		self.ats_num_layout.addWidget(self.ats_num_lbl)
 		self.ats_num = QSpinBox()
-		self.ats_num.setSuffix(' person(s)')
+		self.ats_num.setSuffix(tr('stgwnd_ps'))
 		self.ats_num.setRange(1, 500)
 		self.ats_num.setSingleStep(1)
 		self.ats_num.setValue(int(l('ats_num', 20)))
@@ -166,30 +171,30 @@ class SettingsWnd(QDialog):
 		self.autostop_layout.addLayout(self.ats_num_layout)
 
 		self.ats_time_layout = QHBoxLayout()
-		self.ats_time_lbl = QLabel('Delay between each selection: ')
+		self.ats_time_lbl = QLabel(tr('stgwnd_dl'))
 		self.ats_time_layout.addWidget(self.ats_time_lbl)
 		self.ats_time = QSpinBox()
-		self.ats_time.setSuffix(' milliseconds')
+		self.ats_time.setSuffix(tr('stgwnd_ms'))
 		self.ats_time.setRange(10, 1000)
 		self.ats_time.setSingleStep(10)
 		self.ats_time.setValue(int(l('ats_time', 100)))
 		self.ats_time_layout.addWidget(self.ats_time)
 		self.autostop_layout.addLayout(self.ats_time_layout)
 
-		self.antirep_settings = QGroupBox('Anti-Repetition')
+		self.antirep_settings = QGroupBox(tr('stgwnd_antirep'))
 		self.antirep_layout_ = QVBoxLayout()
 		self.antirep_settings.setLayout(self.antirep_layout_)
 		self.general_layout.addWidget(self.antirep_settings)
 		
 		self.antirep_enabled = int(l('antirep_enabled', 1))
-		self.antirep_chk = QCheckBox('Enable anti-repetition')
+		self.antirep_chk = QCheckBox(tr('stgwnd_enb'))
 		self.antirep_chk.setChecked(self.antirep_enabled)
 		self.antirep_chk.checkStateChanged.connect(self.antirep_changed)
 		self.antirep_layout_.addWidget(self.antirep_chk)
 
 		self.antirep_layout = QHBoxLayout()
 		self.antirep_layout_.addLayout(self.antirep_layout)
-		self.antirep_lbl = QLabel('Do not repeat for ')
+		self.antirep_lbl = QLabel(tr('stgwnd_norep'))
 		self.antirep_layout.addWidget(self.antirep_lbl)
 
 		self.antirep_num = int(l('antirep_num', int(l('data', DEFAULT_DATA)['tot']) // 2))
@@ -197,27 +202,27 @@ class SettingsWnd(QDialog):
 		self.antirep_numspn.setRange(1, l('data', DEFAULT_DATA)['tot'])
 		self.antirep_numspn.setSingleStep(1)
 		self.antirep_numspn.setValue(self.antirep_num if self.antirep_enabled else 1)
-		self.antirep_numspn.setSuffix(' person(s)')
+		self.antirep_numspn.setSuffix(tr('stgwnd_ps'))
 		self.antirep_numspn.setEnabled(self.antirep_enabled)
 		self.antirep_layout.addWidget(self.antirep_numspn)
 
-		self.antirep_note = QLabel('<b>Note</b>: Setting 1 is the same as disabling.')
+		self.antirep_note = QLabel(tr('stgwnd_note'))
 		self.antirep_layout_.addWidget(self.antirep_note)
 
-		self.ie_settings = QGroupBox('Import/Export')
+		self.ie_settings = QGroupBox(tr('stgwnd_impexp'))
 		self.ie_layout = QHBoxLayout()
 		self.ie_settings.setLayout(self.ie_layout)
 		self.general_layout.addWidget(self.ie_settings)
 
-		self.ie_lbl = QLabel('Export settings file from you current settings that can be imported on a different machine. The names and chances will also be exported.')
+		self.ie_lbl = QLabel(tr('stgwnd_impexpnote'))
 		self.ie_lbl.setWordWrap(True)
 		self.ie_layout.addWidget(self.ie_lbl)
 
 		self.ie_btn = QVBoxLayout()
-		self.import_btn = QPushButton('Import')
+		self.import_btn = QPushButton(tr('stgwnd_impexp').split('/')[0])
 		self.import_btn.clicked.connect(self.import_settings)
 		self.ie_btn.addWidget(self.import_btn)
-		self.export_btn = QPushButton('Export')
+		self.export_btn = QPushButton(tr('stgwnd_impexp').split('/')[1])
 		self.export_btn.clicked.connect(self.export_settings)
 		self.ie_btn.addWidget(self.export_btn)
 		self.ie_layout.addLayout(self.ie_btn)
@@ -229,7 +234,7 @@ class SettingsWnd(QDialog):
 		self.name_layout_ = QVBoxLayout()
 		self.name_widget.setLayout(self.name_layout_)
 
-		self.name_warn = QLabel('<b>Warning</b>: Be sure to press the "Apply" button at the bottom before going back to the "General" tab to make further changes.')
+		self.name_warn = QLabel(tr('stgwnd_namewarn'))
 		self.name_warn.setWordWrap(True)
 		self.name_layout_.addWidget(self.name_warn)
 
@@ -241,9 +246,9 @@ class SettingsWnd(QDialog):
 		self.btns_widget = QWidget()
 		self.btns_widget.setLayout(self.btns_layout)
 
-		self.add_btn = QPushButton('Add')
-		self.edit_btn = QPushButton('Edit')
-		self.del_btn = QPushButton('Delete')
+		self.add_btn = QPushButton(tr('stgwnd_add'))
+		self.edit_btn = QPushButton(tr('stgwnd_edit'))
+		self.del_btn = QPushButton(tr('stgwnd_del'))
 		self.btns_layout.addWidget(self.add_btn, alignment=Qt.AlignmentFlag.AlignTop)
 		self.btns_layout.addWidget(self.edit_btn, alignment=Qt.AlignmentFlag.AlignTop)
 		self.btns_layout.addWidget(self.del_btn, alignment=Qt.AlignmentFlag.AlignTop)
@@ -265,7 +270,7 @@ class SettingsWnd(QDialog):
 			try:
 				self.cur_seed = int(self.seed_entry.text())
 			except: pass
-			self.seed_entry.setText('<Random>')
+			self.seed_entry.setText(tr('stgwnd__rand'))
 		self.seed_entry.setEnabled(self.seed_type)
 
 	def antirep_changed(self, state):
@@ -302,7 +307,58 @@ class SettingsWnd(QDialog):
 		self.antirep_changed(0)
 		self.name_table.set_value(dict(l('data', DEFAULT_DATA)))
 
+	def reload_lang(self):
+		self.setWindowTitle(tr('stgwnd_title'))
+		self.tabs.setTabText(0, tr('stgwnd_general'))
+		self.tabs.setTabText(1, tr('stgwnd_nc'))
+		self.ok.setText(tr('stgwnd_ok'))
+		self.cancel.setText(tr('stgwnd_cancel'))
+		self.apply.setText(tr('stgwnd_apply'))
+		self.help.setText(tr('stgwnd_help'))
+		self.wnd_settings.setTitle(tr('stgwnd_wnd'))
+		self.wnd_behavior.setText(tr('stgwnd_bhv'))
+		self.wnd_btns[0].setText(tr('stgwnd_fixed'))
+		self.wnd_btns[1].setText(tr('stgwnd_rsz'))
+		self.sot_chk.setText(tr('stgwnd_sot'))
+		self.initsz_lbl.setText(tr('stgwnd_initsz'))
+		self.initsz_x.setSuffix(tr('stgwnd_px'))
+		self.initsz_x.setSuffix(tr('stgwnd_px'))
+		self.initsz_y.setSuffix(tr('stgwnd_px'))
+		self.initsz_wd.setText(tr('stgwnd_w'))
+		self.initsz_he.setText(tr('stgwnd_h'))
+
+		self.seed_settings.setTitle(tr('stgwnd_seed'))
+		self.seed_type_lbl.setText(tr('stgwnd_type'))
+		self.seed_btns[0].setText(tr('stgwnd_rand'))
+		self.seed_btns[1].setText(tr('stgwnd_cst'))
+		self.seed_entry.setText(str(self.cur_seed) if self.seed_type else tr('stgwnd__rand'))
+		self.seed_warn.setText(tr('stgwnd_seedwarn'))
+
+		self.autostop_settings.setTitle(tr('stgwnd_ats'))
+		self.ats_num_lbl.setText(tr('stgwnd_pp'))
+		self.ats_num.setSuffix(tr('stgwnd_ps'))
+		self.ats_time_lbl.setText(tr('stgwnd_dl'))
+		self.ats_time.setSuffix(tr('stgwnd_ms'))
+
+		self.antirep_settings.setTitle(tr('stgwnd_antirep'))
+		self.antirep_chk.setText(tr('stgwnd_enb'))
+		self.antirep_lbl.setText(tr('stgwnd_norep'))
+		self.antirep_numspn.setSuffix(tr('stgwnd_ps'))
+		self.antirep_note.setText(tr('stgwnd_note'))
+
+		self.ie_settings.setTitle(tr('stgwnd_impexp'))
+		self.ie_lbl.setText(tr('stgwnd_impexpnote'))
+		self.import_btn.setText(tr('stgwnd_impexp').split('/')[0])
+		self.export_btn.setText(tr('stgwnd_impexp').split('/')[1])
+
+		self.name_warn.setText(tr('stgwnd_namewarn'))
+		self.add_btn.setText(tr('stgwnd_add'))
+		self.edit_btn.setText(tr('stgwnd_edit'))
+		self.del_btn.setText(tr('stgwnd_del'))
+
 	def save_settings(self, ok=False):
+		s('lang', int(self.lang.currentIndex()))
+		upd_lang()
 		s('wnd_behavior', int(self.wnd_btns[1].isChecked()))
 		s('stay_on_top', int(self.sot_chk.isChecked()))
 
@@ -320,6 +376,11 @@ class SettingsWnd(QDialog):
 		s('antirep_num', self.antirep_numspn.value())
 
 		s('data', self.name_table.get_value())
+
+		self.reload_lang()
+		self.name_table.reload_lang()
+		self.parent.reload_lang()
+		self.parent.random_engine.reload_lang()
 
 		self.reload_settings(True)
 		self.parent.reload_settings()

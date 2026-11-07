@@ -1,13 +1,14 @@
 """A custom dialog when the user clickes the add/edit buttons on the start page."""
 
-from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout, QSpinBox, QLayout
+from PySide6.QtWidgets import QDialog, QDialogButtonBox, QFormLayout, QLineEdit, QVBoxLayout, QHBoxLayout, QSpinBox, QLayout, QPushButton
 
 from core.utils import get_dlg_dimension as g
+from core.translator import tr
 
 class AddDialog(QDialog):
 	def __init__(self, parent, default_weight):
 		super().__init__(parent)
-		self.setWindowTitle('Add person - RSAP')
+		self.setWindowTitle(tr('nametb_addp') + ' - RSAP')
 		self.setFixedSize(g())
 		self.index_edit = QLineEdit()
 		self.name_edit = QLineEdit()
@@ -16,16 +17,19 @@ class AddDialog(QDialog):
 		self.weight_edit.setMinimum(0)
 		
 		self.form = QFormLayout()
-		self.form.addRow('Index: ', self.index_edit)
-		self.form.addRow('Name: ', self.name_edit)
-		self.form.addRow('Weight: ', self.weight_edit)
-		self.buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-		self.buttons.accepted.connect(self.accept)
-		self.buttons.rejected.connect(self.reject)
+		self.form.addRow(tr('nametb_idx') + ': ', self.index_edit)
+		self.form.addRow(tr('nametb_name') + ': ', self.name_edit)
+		self.form.addRow(tr('nametb_wei') + ': ', self.weight_edit)
+
+		self.button_box = QDialogButtonBox()
+		self.ok_btn = self.button_box.addButton(tr('stgwnd_ok'), QDialogButtonBox.ButtonRole.AcceptRole)
+		self.cancel_btn = self.button_box.addButton(tr('stgwnd_cancel'), QDialogButtonBox.ButtonRole.RejectRole)
+		self.button_box.accepted.connect(self.accept)
+		self.button_box.rejected.connect(self.reject)
 		
 		self.layout = QVBoxLayout()
 		self.layout.addLayout(self.form)
-		self.layout.addWidget(self.buttons)
+		self.layout.addWidget(self.button_box)
 		self.setLayout(self.layout)
 
 		self.layout.setSizeConstraint(QLayout.SetFixedSize)
@@ -37,7 +41,7 @@ class EditDialog(QDialog):
 	def __init__(self, parent, idxs, names, default_weight, multi: bool):
 		super().__init__(parent)
 		self.multi = multi
-		self.setWindowTitle('Edit person - RSAP')
+		self.setWindowTitle(tr('nametb_editp') + ' - RSAP')
 		self.setFixedSize(g())
 		self.index_edit = QLineEdit()
 		self.name_edit = QLineEdit()
@@ -47,12 +51,17 @@ class EditDialog(QDialog):
 			self.weight_edit.setValue(int(default_weight))
 		
 		self.form = QFormLayout()
-		self.form.addRow('Index: ', self.index_edit)
-		self.form.addRow('Name: ', self.name_edit)
-		self.form.addRow('Weight: ', self.weight_edit)
-		self.buttons = QDialogButtonBox(QDialogButtonBox.Ok | QDialogButtonBox.Cancel)
-		self.buttons.accepted.connect(self.accept)
-		self.buttons.rejected.connect(self.reject)
+		self.form.addRow(tr('nametb_idx') + ': ', self.index_edit)
+		self.form.addRow(tr('nametb_name') + ': ', self.name_edit)
+		self.form.addRow(tr('nametb_wei') + ': ', self.weight_edit)
+
+		self.buttons_layout = QHBoxLayout()
+		self.ok_btn = QPushButton(tr('stgwnd_ok'))
+		self.cancel_btn = QPushButton(tr('stgwnd_cancel'))
+		self.buttons_layout.addWidget(self.ok_btn)
+		self.buttons_layout.addWidget(self.cancel_btn)
+		self.ok_btn.clicked.connect(self.accept)
+		self.cancel_btn.clicked.connect(self.reject)
 
 		if not multi:
 			self.index_edit.setText(idxs[0])
@@ -64,7 +73,7 @@ class EditDialog(QDialog):
 			self.name_edit.setEnabled(False)
 		self.layout = QVBoxLayout()
 		self.layout.addLayout(self.form)
-		self.layout.addWidget(self.buttons)
+		self.layout.addLayout(self.buttons_layout)
 		self.setLayout(self.layout)
 
 		self.layout.setSizeConstraint(QLayout.SetFixedSize)

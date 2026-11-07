@@ -3,12 +3,13 @@ from PySide6.QtGui import QFont
 from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QFrame, QPushButton, QSizePolicy, QCheckBox, QLineEdit
 
 from core.utils import get_window_dimension as g
-from core.config import PLATFORM, FULL_NAME
+from core.config import PLATFORM, VERSION
 from ui.hidden_wnd import RSAPHiddenWnd
 from ui.settings_wnd import SettingsWnd
 from ui.about_wnd import RSAPAboutWnd
 from core.rand_engine import RandomEngine
 from core.settings import load as l
+from core.translator import tr
 
 import logging
 
@@ -92,7 +93,7 @@ class RSAPMainWindow(QMainWindow):
 		self.tools_widget = QWidget()
 		self.tools_widget.setLayout(self.tools_layout)
 
-		self.step_btn = QPushButton('Step', self)
+		self.step_btn = QPushButton(tr('mainwnd_step'), self)
 		self.step_btn.setFixedWidth(self.width() * 2 // 5)
 		self.step_btn.setFixedHeight(self.height() // 3)
 		tmp_font = self.step_btn.font()
@@ -100,7 +101,7 @@ class RSAPMainWindow(QMainWindow):
 		self.step_btn.setFont(tmp_font)
 		self.tools_layout.addWidget(self.step_btn, alignment=Qt.AlignmentFlag.AlignHCenter)
 
-		self.start_btn = QPushButton('Start', self)
+		self.start_btn = QPushButton(tr('mainwnd_start'), self)
 		self.start_btn.setFixedWidth(self.width() * 2 // 5)
 		self.start_btn.setFixedHeight(self.height() // 3)
 		self.start_btn.setFont(tmp_font)
@@ -112,12 +113,12 @@ class RSAPMainWindow(QMainWindow):
 		
 		self.misc_layout = QHBoxLayout()
 
-		self.settings_btn = QPushButton('Settings', self)
+		self.settings_btn = QPushButton(tr('mainwnd_settings'), self)
 		self.settings_btn.setFixedHeight(self.height() // 8)
 		self.settings_btn.setFixedWidth(self.width() * 23 // 120)
 		self.misc_layout.addWidget(self.settings_btn)
 
-		self.about_btn = QPushButton('About', self)
+		self.about_btn = QPushButton(tr('mainwnd_about'), self)
 		self.about_btn.setFixedHeight(self.height() // 8)
 		self.about_btn.setFixedWidth(self.width() * 23 // 120)
 		self.misc_layout.addWidget(self.about_btn)
@@ -125,7 +126,7 @@ class RSAPMainWindow(QMainWindow):
 
 		self.tools_layout.addLayout(self.misc_layout)
 
-		self.misc_label = QLabel(f'{FULL_NAME} <a href="hide_wnd">Hide Window</a>', self)
+		self.misc_label = QLabel(tr('version_text', ver=VERSION) + '. <a href="hide_wnd">' + tr('mainwnd_hide') + '</a>', self)
 		self.misc_label.setOpenExternalLinks(False)
 		self.tools_layout.addWidget(self.misc_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 		self.tools_layout.setSpacing(self.height() // 40)
@@ -135,6 +136,13 @@ class RSAPMainWindow(QMainWindow):
 		self.main_layout.setContentsMargins(0, 0, 0, 0)
 		self.main_layout.setSpacing(0)
 		self.setCentralWidget(self.main_widget)
+
+		self.initial = True
+
+		self.cur_idx = ''
+		self.cur_name = ''
+		self.cur_weight = 0
+		self.cur_chance = 0
 
 	def upd_wndflags(self):
 		if int(l('stay_on_top', 1)) and not self.on_top:
@@ -146,6 +154,24 @@ class RSAPMainWindow(QMainWindow):
 
 		self.show()
 		lgr.info('Main window flags updated')
+
+	def reload_lang(self):
+		self.step_btn.setText(tr('mainwnd_step'))
+		self.start_btn.setText(tr('mainwnd_start'))
+		self.settings_btn.setText(tr('mainwnd_settings'))
+		self.about_btn.setText(tr('mainwnd_about'))
+		if self.width() <= 400:
+			self.misc_label.setText('<a href="hide_wnd">' + tr('mainwnd_hide') + '</a>')
+		else:
+			self.misc_label.setText(tr('version_text', ver=VERSION) + '. <a href="hide_wnd">' + tr('mainwnd_hide') + '</a>')
+
+		if self.initial:
+			self.nn_widget.setToolTip('')
+		else:
+			self.nn_widget.setToolTip(tr('mainwnd_tooltip', idx=self.cur_idx, name=self.cur_name, weight=self.cur_weight, chance=self.cur_chance))
+
+		self.hiddenwnd.setText(tr('hidewnd_text'))
+		self.aboutwnd.reload_lang()
 
 	def reload_settings(self):
 		if not int(l('wnd_behavior', 0)):
@@ -180,9 +206,9 @@ class RSAPMainWindow(QMainWindow):
 		self.misc_layout.setSpacing(self.width() // 60)
 		self.tools_layout.setSpacing(self.height() // 40)
 		if self.width() <= 400:
-			self.misc_label.setText('<a href="hide_wnd">Hide Window</a>')
+			self.misc_label.setText('<a href="hide_wnd">' + tr('mainwnd_hide') + '</a>')
 		else:
-			self.misc_label.setText(f'{FULL_NAME}. <a href="hide_wnd">Hide Window</a>')
+			self.misc_label.setText(tr('version_text', ver=VERSION) + '. <a href="hide_wnd">' + tr('mainwnd_hide') + '</a>')
 
 	def hidebtn_clicked(self, link: str):
 		lgr.info('Hide window activated')
@@ -194,7 +220,14 @@ class RSAPMainWindow(QMainWindow):
 	def update_nn(self, idx, name, weight, chance):
 		self.number_label.setText(str(idx))
 		self.name_label.setText(str(name))
-		self.nn_widget.setToolTip(f'No. {idx}; Name: {name}; Weight: {weight}; Chance: {chance:.2f}%')
+		self.nn_widget.setToolTip(tr('mainwnd_tooltip', idx=idx, name=name, weight=weight, chance=chance))
+		
+		self.cur_idx = idx
+		self.cur_name = name
+		self.cur_weight = weight
+		self.cur_chance = chance
+		self.initial = False
+
 		self.name_label.home(False)
 		self.number_label.home(False)
 

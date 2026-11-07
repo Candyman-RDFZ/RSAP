@@ -1,15 +1,17 @@
 from PySide6.QtWidgets import QMessageBox, QVBoxLayout, QLabel, QPushButton
 
+from core.translator import tr
+
 class UpdchkDialog(QMessageBox):
 	def __init__(self, parent):
 		super().__init__(parent)
 		self.parent = parent
 		
-		self.setWindowTitle('Checking - RSAP')
+		self.setWindowTitle(tr('updchk_chk') + ' - RSAP')
 		self.setIcon(QMessageBox.Information)
-		self.setText('Checking for updates. Please wait...')
+		self.setText(tr('updchk_chking'))
 
-		self.abort_btn = QPushButton('Abort')
+		self.abort_btn = QPushButton(tr('updchk_abrt'))
 		self.abort_btn.clicked.connect(self.abort)
 		self.addButton(self.abort_btn, QMessageBox.ButtonRole.RejectRole)
 

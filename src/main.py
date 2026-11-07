@@ -1,7 +1,7 @@
 from PySide6.QtGui import QIcon
 from PySide6.QtWidgets import QApplication
 
-from core.config import NAME, ORG, FULL_NAME, PLATFORM, EXEC, ID
+from core.config import NAME, VERSION, ORG, PLATFORM, EXEC, ID
 from core.utils import sanitize_path as p
 from ui.main_window import RSAPMainWindow
 from core.logs.setup_log import setup_logging
@@ -14,7 +14,7 @@ setup_logging()
 lgr = logging.getLogger(__name__)
 
 lgr.info('==================================')
-lgr.info(FULL_NAME)
+lgr.info(f'{NAME} version {VERSION}')
 lgr.info(f'Platform: {PLATFORM}')
 lgr.info(f'Running as: {'executable' if EXEC else 'source code'}')
 

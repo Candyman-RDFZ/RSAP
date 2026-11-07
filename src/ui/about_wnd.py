@@ -2,11 +2,12 @@ from PySide6.QtCore import Qt, QUrl
 from PySide6.QtGui import QPixmap, QDesktopServices
 from PySide6.QtWidgets import QDialog, QLabel, QVBoxLayout, QSizePolicy, QMessageBox, QLayout
 
-from core.config import VERSION, FULL_NAME
+from core.config import VERSION
 from core.utils import get_about_wnd_dimension as g
 from core.utils import sanitize_path as p
 from core.update_checker import UpdateChecker
 from ui.updchk_dialog import UpdchkDialog
+from core.translator import tr
 
 import json
 
@@ -31,7 +32,7 @@ class RSAPAboutWnd(QDialog):
 		self.logo_lbl.setPixmap(self.logo)
 		self.layout.addWidget(self.logo_lbl, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
 
-		self.lbl = QLabel(f"<center>{FULL_NAME}. <a href=\"chkupd\">Check for Updates</a>.</center><p><b>RSAP (Randomly Select a Person)</b> is a free, powerful, and cross-platform tool for random selection. Despite being originally designed for selecting random people in classrooms, its high customizability allows it to be used in almost all scenarios involving random selection, such as the lottery.</p><p>Copyright &copy; 2026 <a href=\"https://candyman33.cc/\">Candy_man</a>.<br>This program comes with ABSOLUTELY NO WARRANTY.<br>This is free software, and you are welcome to redistribute it under certain conditoins. See the <a href=\"https://www.gnu.org/licenses/gpl-3.0.html\">GNU General Public License</a> for more details.</p><p>For more information and help on using, please refer to the following links:<center>Website: <a href=\"https://candyman33.cc/p/RSAP/\">https://candyman33.cc/p/RSAP/</a><br>Help: <a href=\"https://candyman33.cc/p/RSAP/h/\">https://candyman33.cc/p/RSAP/h/</a><br>Source code: <a href=\"https://github.com/Candyman-RDFZ/RSAP/\">GitHub</a> | <a href=\"https://gitee.com/Candyman-RDFZ/RSAP/\">Gitee</a><br><b>Donate!</b>&nbsp;&nbsp;<a href=\"https://candyman33.cc/m/donate\">https://candyman33.cc/m/donate</a></center></p>")
+		self.lbl = QLabel(tr('about_text', ver=VERSION))
 		self.lbl.setWordWrap(True)
 		self.lbl.setOpenExternalLinks(False)
 		self.lbl.linkActivated.connect(self.on_click)
@@ -41,6 +42,9 @@ class RSAPAboutWnd(QDialog):
 
 		self.setLayout(self.layout)
 		self.layout.setSizeConstraint(QLayout.SetFixedSize)
+
+	def reload_lang(self):
+		self.lbl.setText(tr('about_text', ver=VERSION))
 
 	def on_click(self, link):
 		if link != 'chkupd':
@@ -54,25 +58,32 @@ class RSAPAboutWnd(QDialog):
 		text = json.loads(text)
 		ver = text['ver']
 		if ver == VERSION:
-			QMessageBox.information(self, 'Info - RSAP', f'RSAP is already the newest version ({VERSION}).', buttons=QMessageBox.Ok)
+			dialog = QMessageBox(self)
+			dialog.setWindowTitle(tr('updchk_info') + ' - RSAP')
+			dialog.setIcon(QMessageBox.Information)
+			dialog.setText(tr('updchk_newest', version=VERSION))
+			ok_btn = dialog.addButton(tr('stgwnd_ok'), QMessageBox.ButtonRole.AcceptRole)
+			dialog.exec()
 			return
 		changes = text['changes']
 		dialog = QMessageBox(self)
-		dialog.setWindowTitle('Info - RSAP')
-		dialog.setText(f'<p>A newer version of RSAP ({ver}) was found. (The current version is {VERSION})</p><p>Changes in the newest version include:{changes}</p><p>You can download the newest version at <a href=\"https://candyman33.cc/p/RSAP/d/{ver}/\">https://candyman33.cc/p/RSAP/d/{ver}/</a>')
+		dialog.setWindowTitle(tr('updchk_info') + ' - RSAP')
+		dialog.setText(tr('updchk_old', newver=ver, oldver=VERSION, changes=changes))
 		dialog.setIcon(QMessageBox.Information)
-		dialog.setStandardButtons(QMessageBox.Open | QMessageBox.Ok)
-		res = dialog.exec()
-		if res == QMessageBox.Open:
+		ok_btn = dialog.addButton(tr('stgwnd_ok'), QMessageBox.ButtonRole.RejectRole)
+		open_btn = dialog.addButton(tr('updchk_open'), QMessageBox.ButtonRole.AcceptRole)
+		dialog.exec()
+		if dialog.clickedButton() == open_btn: 
 			QDesktopServices.openUrl(QUrl(f'https://candyman33.cc/p/RSAP/d/{ver}/'))
 
 	def on_error(self, text):
 		self.updchk_dialog.force_close()
 		dialog = QMessageBox(self)
-		dialog.setWindowTitle('Error - RSAP')
-		dialog.setText(f'<p>Failed to check for updates. Please check your internet connection, and try again.</p><p>Error string: {text}</p>')
+		dialog.setWindowTitle(tr('updchk_error') + ' - RSAP')
+		dialog.setText(tr('updchk_errtext', text=text))
 		dialog.setIcon(QMessageBox.Critical)
-		dialog.setStandardButtons(QMessageBox.Ok | QMessageBox.Retry)
-		res = dialog.exec()
-		if res == QMessageBox.Retry:
+		close_btn = dialog.addButton(tr('updchk_close'), QMessageBox.ButtonRole.RejectRole)
+		retry_btn = dialog.addButton(tr('updchk_retry'), QMessageBox.ButtonRole.AcceptRole)
+		dialog.exec()
+		if dialog.clickedButton() == retry_btn:
 			self.updchk.chk()

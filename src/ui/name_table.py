@@ -7,6 +7,7 @@ from PySide6.QtGui import QDrag
 from PySide6.QtWidgets import QAbstractItemView, QDialog, QTableWidget, QTableWidgetItem, QPushButton, QHeaderView, QMessageBox
 
 from .set_data_dialog import AddDialog, EditDialog
+from core.translator import tr
 
 class NameTableWidget(QTableWidget):
 	def __init__(self, add_button: QPushButton, edit_button: QPushButton, del_button: QPushButton, parent=None):
@@ -18,7 +19,7 @@ class NameTableWidget(QTableWidget):
 		self.del_button = del_button
 
 		self.setColumnCount(4)
-		self.setHorizontalHeaderLabels(['Index', 'Name', 'Weight', 'Chance'])
+		self.setHorizontalHeaderLabels([tr('nametb_idx'), tr('nametb_name'), tr('nametb_wei'), tr('nametb_ch')])
 		self.verticalHeader().setVisible(False)
 		self.horizontalHeader().setSectionResizeMode(QHeaderView.Stretch)
 		self.setSelectionBehavior(QAbstractItemView.SelectRows)
@@ -41,6 +42,9 @@ class NameTableWidget(QTableWidget):
 
 		self.update_edit_del()
 	
+	def reload_lang(self):
+		self.setHorizontalHeaderLabels([tr('nametb_idx'), tr('nametb_name'), tr('nametb_wei'), tr('nametb_ch')])
+
 	def update_edit_del(self):
 		sel_rows = self.selectionModel().selectedRows()
 		self.del_button.setEnabled(bool(sel_rows))
