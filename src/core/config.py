@@ -4,6 +4,7 @@ import pathlib
 import platform
 
 NAME = 'RSAP'
+ORG = 'Candy_man'
 VERSION = '2.0a'
 ID = 'io.github.Candyman-RDFZ.RSAP'
 
