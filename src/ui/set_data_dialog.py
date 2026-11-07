@@ -55,13 +55,11 @@ class EditDialog(QDialog):
 		self.form.addRow(tr('nametb_name') + ': ', self.name_edit)
 		self.form.addRow(tr('nametb_wei') + ': ', self.weight_edit)
 
-		self.buttons_layout = QHBoxLayout()
-		self.ok_btn = QPushButton(tr('stgwnd_ok'))
-		self.cancel_btn = QPushButton(tr('stgwnd_cancel'))
-		self.buttons_layout.addWidget(self.ok_btn)
-		self.buttons_layout.addWidget(self.cancel_btn)
-		self.ok_btn.clicked.connect(self.accept)
-		self.cancel_btn.clicked.connect(self.reject)
+		self.button_box = QDialogButtonBox()
+		self.ok_btn = self.button_box.addButton(tr('stgwnd_ok'), QDialogButtonBox.ButtonRole.AcceptRole)
+		self.cancel_btn = self.button_box.addButton(tr('stgwnd_cancel'), QDialogButtonBox.ButtonRole.RejectRole)
+		self.button_box.accepted.connect(self.accept)
+		self.button_box.rejected.connect(self.reject)
 
 		if not multi:
 			self.index_edit.setText(idxs[0])
@@ -73,7 +71,7 @@ class EditDialog(QDialog):
 			self.name_edit.setEnabled(False)
 		self.layout = QVBoxLayout()
 		self.layout.addLayout(self.form)
-		self.layout.addLayout(self.buttons_layout)
+		self.layout.addWidget(self.button_box)
 		self.setLayout(self.layout)
 
 		self.layout.setSizeConstraint(QLayout.SetFixedSize)
