@@ -14,7 +14,7 @@ class AddDialog(QDialog):
 		self.name_edit = QLineEdit()
 		self.weight_edit = QSpinBox()
 		self.weight_edit.setValue(int(default_weight))
-		self.weight_edit.setMinimum(0)
+		self.weight_edit.setRange(0, 10000)
 		
 		self.form = QFormLayout()
 		self.form.addRow(tr('nametb_idx') + ': ', self.index_edit)
@@ -46,7 +46,7 @@ class EditDialog(QDialog):
 		self.index_edit = QLineEdit()
 		self.name_edit = QLineEdit()
 		self.weight_edit = QSpinBox()
-		self.weight_edit.setMinimum(0)
+		self.weight_edit.setRange(0, 10000)
 		if not multi:
 			self.weight_edit.setValue(int(default_weight))
 		

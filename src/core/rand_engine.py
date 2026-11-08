@@ -58,8 +58,8 @@ class RandomEngine:
 		self.antirep = int(l('antirep_enabled', 1))
 		self.antirep_num = int(l('antirep_num', len(self.data) // 2))
 		self.data = dict(l('data', {'tot': 0, 'tot_weight': 0}))
-		self.tot = self.data['tot']
-		self.tot_weight = self.data['tot_weight']
+		self.tot = int(self.data['tot'])
+		self.tot_weight = int(self.data['tot_weight'])
 		self.pool = self.build_pool()
 		self.antirep_queue = []
 
@@ -70,7 +70,7 @@ class RandomEngine:
 		self.data_str = f'Data:\nTotal: {self.tot}'
 		if self.tot == 0 or self.tot_weight == 0: return
 		for i in range(self.tot):
-			cur_data = self.data[i]
+			cur_data = self.data[str(i)]
 			cur_chance = cur_data['weight'] / self.tot_weight * 100
 			cur_str = f'No. {cur_data['idx']}; Name: {cur_data['name']}; Weight: {cur_data['weight']}; Chance: {cur_chance:.2f}%'
 			self.data_str += '\n' + cur_str
@@ -81,7 +81,7 @@ class RandomEngine:
 		if self.tot == 0:
 			return []
 		for i in range(self.tot):
-			cur_weight = self.data[i]['weight']
+			cur_weight = self.data[str(i)]['weight']
 			for j in range(cur_weight):
 				res.append(i)
 		return res
@@ -91,7 +91,7 @@ class RandomEngine:
 		self.pool = [self.pool[i] for i in range(pool_len) if self.pool[i] != idx]
 
 	def add_to_pool(self, idx):
-		weight = self.data[idx]['weight']
+		weight = self.data[str(idx)]['weight']
 		for i in range(weight):
 			self.pool.append(idx)
 
@@ -112,10 +112,10 @@ class RandomEngine:
 		cur = self.rng.choice(self.pool)
 		if self.antirep:
 			self.process_antirep(cur)
-		idx = self.data[cur]['idx']
-		name = self.data[cur]['name']
-		weight = self.data[cur]['weight']
-		chance = self.data[cur]['weight'] / self.tot_weight * 100
+		idx = self.data[str(cur)]['idx']
+		name = self.data[str(cur)]['name']
+		weight = self.data[str(cur)]['weight']
+		chance = self.data[str(cur)]['weight'] / self.tot_weight * 100
 		lgr.info(f'Current person: No. {idx} ({name})')
 		return (idx, name, weight, chance)
 

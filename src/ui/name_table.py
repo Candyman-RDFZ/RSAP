@@ -194,7 +194,7 @@ class NameTableWidget(QTableWidget):
 		res = {'tot': self.tot, 'tot_weight': self.tot_weight}
 		for i in range(self.tot):
 			cur_data = {'idx': self.item(i, 0).text(), 'name': self.item(i, 1).text(), 'weight': int(self.item(i, 2).text())}
-			res[i] = cur_data
+			res[str(i)] = cur_data
 		return res
 	
 	def set_value(self, data: dict):
@@ -203,7 +203,7 @@ class NameTableWidget(QTableWidget):
 			self.tot_weight = int(data['tot_weight'])
 			self.setRowCount(self.tot)
 			for i in range(self.tot):
-				cur_dict = data[i]
+				cur_dict = data[str(i)]
 				index = cur_dict['idx']
 				name = cur_dict['name']
 				weight = cur_dict['weight']
@@ -215,7 +215,6 @@ class NameTableWidget(QTableWidget):
 				else:
 					self.setItem(i, 3, QTableWidgetItem('/'))
 		except Exception as e:
-			print(e)
 			dialog = QMessageBox.critical(self.parent, 'Error - RSAP', 'Cannot load data from settings.', buttons=QMessageBox.Ok)
 			self.clearContents()
 			self.setRowCount(0)

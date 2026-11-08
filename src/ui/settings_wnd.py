@@ -274,6 +274,8 @@ class SettingsWnd(QDialog):
 		self.seed_entry.setEnabled(self.seed_type)
 
 	def antirep_changed(self, state):
+		if self.antirep_enabled == self.antirep_chk.isChecked():
+			return
 		self.antirep_enabled = self.antirep_chk.isChecked()
 		if self.antirep_enabled:
 			self.antirep_numspn.setValue(self.antirep_num)
@@ -302,6 +304,8 @@ class SettingsWnd(QDialog):
 		self.ats_num.setValue(int(l('ats_num', 20)))
 		self.ats_time.setValue(int(l('ats_time', 100)))
 		self.antirep_enabled = int(l('antirep_enabled', 1))
+
+		self.antirep_chk.setChecked(self.antirep_enabled)
 		self.antirep_num = int(l('antirep_num', int(l('data', DEFAULT_DATA)['tot']) // 2))
 		self.antirep_numspn.setRange(1, l('data', DEFAULT_DATA)['tot'])
 		self.antirep_changed(0)
@@ -373,7 +377,7 @@ class SettingsWnd(QDialog):
 		s('ats_time', self.ats_time.value())
 
 		s('antirep_enabled', int(self.antirep_enabled))
-		s('antirep_num', self.antirep_numspn.value())
+		s('antirep_num', int(self.antirep_numspn.value() if self.antirep_enabled else self.antirep_num))
 
 		s('data', self.name_table.get_value())
 
