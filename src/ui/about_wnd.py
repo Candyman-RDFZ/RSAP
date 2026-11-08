@@ -44,6 +44,7 @@ class RSAPAboutWnd(QDialog):
 		self.layout.setSizeConstraint(QLayout.SetFixedSize)
 
 	def reload_lang(self):
+		self.setWindowTitle(tr('mainwnd_about') + ' RSAP')
 		self.lbl.setText(tr('about_text', ver=VERSION))
 		self.updchk_dialog.reload_lang()
 
@@ -58,7 +59,7 @@ class RSAPAboutWnd(QDialog):
 		self.updchk_dialog.force_close()
 		text = json.loads(text)
 		ver = text['ver']
-		if ver == VERSION:
+		if ver <= VERSION:
 			dialog = QMessageBox(self)
 			dialog.setWindowTitle(tr('updchk_info') + ' - RSAP')
 			dialog.setIcon(QMessageBox.Information)
