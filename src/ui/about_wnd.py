@@ -16,7 +16,7 @@ class RSAPAboutWnd(QDialog):
 		super().__init__(parent)
 		self.parent = parent
 
-		self.setWindowTitle('About RSAP')
+		self.setWindowTitle(tr('mainwnd_about') + ' RSAP')
 		self.setFixedSize(g())
 
 		self.updchk_dialog = UpdchkDialog(self)
