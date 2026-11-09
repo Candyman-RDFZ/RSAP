@@ -96,7 +96,7 @@ class SettingsWnd(QDialog):
 		self.wnd_initsz_layout.addWidget(self.initsz_lbl)
 
 		self.initsz_x = QSpinBox()
-		self.initsz_x.setRange(100, 2000)
+		self.initsz_x.setRange(100, 1000)
 		self.initsz_x.setSuffix(tr('stgwnd_px'))
 		self.initsz_wd = QLabel(tr('stgwnd_w'))
 		try:
@@ -107,7 +107,7 @@ class SettingsWnd(QDialog):
 		self.wnd_initsz_layout.addWidget(self.initsz_x, alignment=Qt.AlignmentFlag.AlignLeft)
 
 		self.initsz_y = QSpinBox()
-		self.initsz_y.setRange(100, 2000)
+		self.initsz_y.setRange(100, 1000)
 		self.initsz_y.setSuffix(tr('stgwnd_px'))
 		self.initsz_he = QLabel(tr('stgwnd_h'))
 		try:
@@ -407,7 +407,7 @@ class SettingsWnd(QDialog):
 		QTimer.singleShot(0, self.parent.upd_wndflags)
 
 	def import_settings(self):
-		filename, _ = QFileDialog.getOpenFileName(self, 'Import settings - RSAP', str(l('stg_dir', QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation))), filter="RSAP Settings File (*.rsap)")
+		filename, _ = QFileDialog.getOpenFileName(self, tr('impexp_imp') + ' - RSAP', str(l('stg_dir', QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation))), filter="RSAP Settings File (*.rsap)")
 		if not filename:
 			return
 		s('stg_dir', str(pathlib.Path(filename).parent))
@@ -415,7 +415,7 @@ class SettingsWnd(QDialog):
 		self.reload_settings()
 
 	def export_settings(self):
-		filename, _ = QFileDialog.getSaveFileName(self, 'Export settings - RSAP', str(l('stg_dir', QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation))) + '/Untitled_RSAP_Settings.rsap', filter="RSAP Settings File (*.rsap)")
+		filename, _ = QFileDialog.getSaveFileName(self, tr('impexp_exp') + ' - RSAP', str(l('stg_dir', QStandardPaths.writableLocation(QStandardPaths.StandardLocation.DocumentsLocation))) + '/Untitled_RSAP_Settings.rsap', filter="RSAP Settings File (*.rsap)")
 		if not filename:
 			return
 		s('stg_dir', str(pathlib.Path(filename).parent))

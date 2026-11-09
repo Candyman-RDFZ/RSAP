@@ -49,6 +49,8 @@ class EditDialog(QDialog):
 		self.weight_edit.setRange(0, 10000)
 		if not multi:
 			self.weight_edit.setValue(int(default_weight))
+		else:
+			self.weight_edit.setValue(1)
 		
 		self.form = QFormLayout()
 		self.form.addRow(tr('nametb_idx') + ': ', self.index_edit)
@@ -69,6 +71,8 @@ class EditDialog(QDialog):
 			self.name_edit.setText(', '.join(names))
 			self.index_edit.setEnabled(False)
 			self.name_edit.setEnabled(False)
+		self.index_edit.home(False)
+		self.name_edit.home(False)
 		self.layout = QVBoxLayout()
 		self.layout.addLayout(self.form)
 		self.layout.addWidget(self.button_box)

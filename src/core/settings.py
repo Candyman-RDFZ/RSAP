@@ -41,10 +41,8 @@ def exp(filepath):
 		'ats_num': ats_num,
 		'ats_time': ats_time,
 		'data': data,
-		'initsz': initsz,
 		'seed_type': seed_type,
 		'rand_seed': rand_seed,
-		'stay_on_top': stay_on_top,
 		'wnd_behavior': wnd_behavior
 	}
 
@@ -61,8 +59,6 @@ def imp(filepath):
 	s('ats_num', data['ats_num'])
 	s('ats_time', data['ats_time'])
 	s('data', data['data'])
-	s('initsz', data['initsz'])
 	s('seed_type', data['seed_type'])
 	s('rand_seed', data['rand_seed'])
-	s('stay_on_top', data['stay_on_top'])
 	s('wnd_behavior', data['wnd_behavior'])

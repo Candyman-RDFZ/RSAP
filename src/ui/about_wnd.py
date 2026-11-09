@@ -7,7 +7,7 @@ from core.utils import get_about_wnd_dimension as g
 from core.utils import sanitize_path as p
 from core.update_checker import UpdateChecker
 from ui.updchk_dialog import UpdchkDialog
-from core.translator import tr
+from core.translator import tr, get_lang
 
 import json
 
@@ -67,16 +67,17 @@ class RSAPAboutWnd(QDialog):
 			ok_btn = dialog.addButton(tr('stgwnd_ok'), QMessageBox.ButtonRole.AcceptRole)
 			dialog.exec()
 			return
-		changes = text['changes']
+		changes = text['changes-' + get_lang()]
 		dialog = QMessageBox(self)
 		dialog.setWindowTitle(tr('updchk_info') + ' - RSAP')
 		dialog.setText(tr('updchk_old', newver=ver, oldver=VERSION, changes=changes))
 		dialog.setIcon(QMessageBox.Information)
-		ok_btn = dialog.addButton(tr('stgwnd_ok'), QMessageBox.ButtonRole.RejectRole)
+		ok_btn = dialog.addButton(tr('updchk_close'), QMessageBox.ButtonRole.RejectRole)
 		open_btn = dialog.addButton(tr('updchk_open'), QMessageBox.ButtonRole.AcceptRole)
+		dialog.setDefaultButton(ok_btn)
 		dialog.exec()
 		if dialog.clickedButton() == open_btn: 
-			QDesktopServices.openUrl(QUrl(f'https://candyman33.cc/p/RSAP/d/{ver}/'))
+			QDesktopServices.openUrl(QUrl(f'https://candyman33.cc/p/RSAP/d/{ver}'))
 
 	def on_error(self, text):
 		self.updchk_dialog.force_close()

@@ -72,7 +72,7 @@ class RSAPMainWindow(QMainWindow):
 		self.number_label.setFont(QFont('Consolas', self.height() // 2))
 		self.number_label.setStyleSheet('color: #0094FF; font-weight: bold; background: transparent; border: none;')
 		self.nn_layout.addWidget(self.number_label, alignment=Qt.AlignmentFlag.AlignTop | Qt.AlignmentFlag.AlignHCenter)
-		
+
 		self.name_label = QLineEdit()
 		self.name_label.setText('')
 		self.name_label.setReadOnly(True)
@@ -82,7 +82,11 @@ class RSAPMainWindow(QMainWindow):
 		tmp_font.setPointSize(self.height() // 6)
 		self.name_label.setFont(tmp_font)
 		self.nn_layout.addWidget(self.name_label, alignment=Qt.AlignmentFlag.AlignBottom | Qt.AlignmentFlag.AlignHCenter)
-		self.nn_layout.setSpacing(0);
+		
+		self.number_label.home(False)
+		self.name_label.home(False)
+
+		self.nn_layout.setSpacing(0)
 		self.main_layout.addWidget(self.nn_widget, alignment=Qt.AlignmentFlag.AlignHCenter, stretch=1)
 
 		self.sep1 = QFrame()
@@ -127,6 +131,8 @@ class RSAPMainWindow(QMainWindow):
 		self.tools_layout.addLayout(self.misc_layout)
 
 		self.misc_label = QLabel(tr('version_text', ver=VERSION) + '. <a href="hide_wnd">' + tr('mainwnd_hide') + '</a>', self)
+		tmp_font.setPointSize(tmp_font.pointSize() * 9 // 10)
+		self.misc_label.setFont(tmp_font)
 		self.misc_label.setOpenExternalLinks(False)
 		self.tools_layout.addWidget(self.misc_label, alignment=Qt.AlignmentFlag.AlignHCenter)
 		self.tools_layout.setSpacing(self.height() // 40)
@@ -205,10 +211,15 @@ class RSAPMainWindow(QMainWindow):
 		self.about_btn.setFont(tmp_font)
 		self.misc_layout.setSpacing(self.width() // 60)
 		self.tools_layout.setSpacing(self.height() // 40)
+		tmp_font.setPointSize(tmp_font.pointSize() * 9 // 10)
+		self.misc_label.setFont(tmp_font)
 		if self.width() <= 400:
 			self.misc_label.setText('<a href="hide_wnd">' + tr('mainwnd_hide') + '</a>')
 		else:
 			self.misc_label.setText(tr('version_text', ver=VERSION) + '. <a href="hide_wnd">' + tr('mainwnd_hide') + '</a>')
+
+		self.number_label.home(False)
+		self.name_label.home(False)
 
 	def hidebtn_clicked(self, link: str):
 		lgr.info('Hide window activated')

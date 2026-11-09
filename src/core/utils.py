@@ -2,7 +2,7 @@ from PySide6.QtCore import QSize
 from PySide6.QtGui import QGuiApplication
 import pathlib
 
-from core.config import ASSETS_ROOT, ROOT
+from core.config import ASSETS_ROOT, LANG_ROOT
 
 def get_window_dimension() -> QSize:
 	screen = QGuiApplication.primaryScreen()
@@ -40,8 +40,8 @@ def get_dlg_dimension() -> QSize():
 	height = screen.size().width() // 10
 	return QSize(width, height)
 
-def sanitize_path(path: str, assets=True) -> str:
-	if assets:
+def sanitize_path(path: str, lang=False) -> str:
+	if not lang:
 		return str(ASSETS_ROOT / path)
 	else:
-		return str(ROOT / path)
+		return str(LANG_ROOT / path)
