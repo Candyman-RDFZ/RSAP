@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt, QSize
 from PySide6.QtGui import QFont
-from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QFrame, QPushButton, QSizePolicy, QCheckBox, QLineEdit
+from PySide6.QtWidgets import QMainWindow, QWidget, QHBoxLayout, QVBoxLayout, QLabel, QFrame, QPushButton, QSizePolicy, QCheckBox, QLineEdit, QApplication
 
 from core.utils import get_window_dimension as g
 from core.config import PLATFORM, VERSION
@@ -22,6 +22,14 @@ class RSAPMainWindow(QMainWindow):
 		lgr.info('Main window initiated')
 		if PLATFORM == 'Linux':
 			lgr.warning('Running on Linux. Some window features, such as stay on top, may not function correctly')
+
+		theme = int(l('theme', 0))
+		if theme == 0:
+			QApplication.styleHints().setColorScheme(Qt.ColorScheme.Unknown)
+		elif theme == 1:
+			QApplication.styleHints().setColorScheme(Qt.ColorScheme.Light)
+		elif theme == 2:
+			QApplication.styleHints().setColorScheme(Qt.ColorScheme.Dark)
 
 		if int(l('stay_on_top', 1)):
 			self.on_top = 1

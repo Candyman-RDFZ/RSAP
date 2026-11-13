@@ -43,16 +43,15 @@ def exp(filepath):
 		'data': data,
 		'seed_type': seed_type,
 		'rand_seed': rand_seed,
-		'wnd_behavior': wnd_behavior
 	}
 
-	with open(filepath, 'w') as file:
+	with open(filepath, 'w', encoding='utf-8') as file:
 		json.dump(data, file, indent=4)
 
 def imp(filepath):
 	s = save
 	data = {}
-	with open(filepath, 'r') as file:
+	with open(filepath, 'r', encoding='utf-8') as file:
 		data = json.load(file)
 	s('antirep_enabled', data['antirep_enabled'])
 	s('antirep_num', data['antirep_num'])
@@ -61,4 +60,3 @@ def imp(filepath):
 	s('data', data['data'])
 	s('seed_type', data['seed_type'])
 	s('rand_seed', data['rand_seed'])
-	s('wnd_behavior', data['wnd_behavior'])

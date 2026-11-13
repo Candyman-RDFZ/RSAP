@@ -1,6 +1,6 @@
 from PySide6.QtCore import Qt, QSize, QRegularExpression, QUrl, QStandardPaths, QTimer
 from PySide6.QtGui import QDesktopServices
-from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox, QSpinBox, QFileDialog, QLayout, QComboBox
+from PySide6.QtWidgets import QDialog, QTabWidget, QVBoxLayout, QWidget, QHBoxLayout, QPushButton, QLabel, QGroupBox, QButtonGroup, QRadioButton, QCheckBox, QLineEdit, QMessageBox, QSpinBox, QFileDialog, QLayout, QComboBox, QApplication
 from PySide6.QtGui import QRegularExpressionValidator
 
 from core.config import DEFAULT_DATA
@@ -31,8 +31,10 @@ class SettingsWnd(QDialog):
 
 		self.tabs = QTabWidget()
 		self.general_widget = QWidget()
+		self.appr_widget = QWidget()
 		self.name_widget = QWidget()
 		self.tabs.addTab(self.general_widget, tr('stgwnd_general'))
+		self.tabs.addTab(self.appr_widget, tr('stgwnd_appr'))
 		self.tabs.addTab(self.name_widget, tr('stgwnd_nc'))
 		self.tabs.setCurrentIndex(0)
 		self.layout.addWidget(self.tabs)
@@ -43,12 +45,8 @@ class SettingsWnd(QDialog):
 		self.cancel = QPushButton(tr('stgwnd_cancel'))
 		self.apply = QPushButton(tr('stgwnd_apply'))
 		self.help = QPushButton(tr('stgwnd_help'))
-		self.lang = QComboBox()
-		self.lang.addItems(['English', '简体中文', '繁體中文'])
-		self.lang.setCurrentIndex(int(l('lang', 0)))
 
 		self.buttons_layout.addWidget(self.help, alignment=Qt.AlignmentFlag.AlignLeft)
-		self.buttons_layout.addWidget(self.lang, alignment=Qt.AlignmentFlag.AlignLeft)
 		self.buttons_layout.addStretch()
 		self.buttons_layout.addWidget(self.ok, alignment=Qt.AlignmentFlag.AlignRight)
 		self.buttons_layout.addWidget(self.cancel, alignment=Qt.AlignmentFlag.AlignRight)
@@ -229,6 +227,42 @@ class SettingsWnd(QDialog):
 
 		self.general_layout.addStretch()
 
+		# -------------------------------
+
+		self.appr_layout = QVBoxLayout()
+		self.appr_widget.setLayout(self.appr_layout)
+
+		self.theme_widget = QGroupBox(tr('stgwnd_theme'))
+		self.appr_layout.addWidget(self.theme_widget)
+		self.theme_layout = QHBoxLayout()
+		self.theme_widget.setLayout(self.theme_layout)
+
+		self.theme_lbl = QLabel(tr('stgwnd_seltheme'))
+		self.theme_layout.addWidget(self.theme_lbl)
+
+		self.theme_cbb = QComboBox()
+		self.theme_cbb.addItems([tr('stgwnd_sysdef'), tr('stgwnd_light'), tr('stgwnd_dark')])
+		self.theme_cbb.setCurrentIndex(int(l('theme', 0)))
+		self.theme_layout.addWidget(self.theme_cbb)
+		self.theme_layout.addStretch()
+
+		self.lang_widget = QGroupBox(tr('stgwnd_lang'))
+		self.appr_layout.addWidget(self.lang_widget)
+		self.lang_layout = QHBoxLayout()
+		self.lang_widget.setLayout(self.lang_layout)
+
+		self.lang_lbl = QLabel(tr('stgwnd_sellang'))
+		self.lang_layout.addWidget(self.lang_lbl)
+
+		self.lang_cbb = QComboBox()
+		self.lang_cbb.addItems(['English', '简体中文', '繁體中文'])
+		self.lang_cbb.setCurrentIndex(int(l('lang', 0)))
+		self.lang_layout.addWidget(self.lang_cbb)
+
+		self.lang_layout.addStretch()
+
+		self.appr_layout.addStretch()
+
 		# --------------------------------
 
 		self.name_layout_ = QVBoxLayout()
@@ -314,7 +348,8 @@ class SettingsWnd(QDialog):
 	def reload_lang(self):
 		self.setWindowTitle(tr('stgwnd_title'))
 		self.tabs.setTabText(0, tr('stgwnd_general'))
-		self.tabs.setTabText(1, tr('stgwnd_nc'))
+		self.tabs.setTabText(1, tr('stgwnd_appr'))
+		self.tabs.setTabText(2, tr('stgwnd_nc'))
 		self.ok.setText(tr('stgwnd_ok'))
 		self.cancel.setText(tr('stgwnd_cancel'))
 		self.apply.setText(tr('stgwnd_apply'))
@@ -355,13 +390,22 @@ class SettingsWnd(QDialog):
 		self.import_btn.setText(tr('stgwnd_impexp').split('/')[0])
 		self.export_btn.setText(tr('stgwnd_impexp').split('/')[1])
 
+		self.theme_widget.setTitle(tr('stgwnd_theme'))
+		self.theme_lbl.setText(tr('stgwnd_seltheme'))
+		self.theme_cbb.setItemText(0, tr('stgwnd_sysdef'))
+		self.theme_cbb.setItemText(1, tr('stgwnd_light'))
+		self.theme_cbb.setItemText(2, tr('stgwnd_dark'))
+
+		self.lang_widget.setTitle(tr('stgwnd_lang'))
+		self.lang_lbl.setText(tr('stgwnd_sellang'))
+
 		self.name_warn.setText(tr('stgwnd_namewarn'))
 		self.add_btn.setText(tr('stgwnd_add'))
 		self.edit_btn.setText(tr('stgwnd_edit'))
 		self.del_btn.setText(tr('stgwnd_del'))
 
 	def save_settings(self, ok=False):
-		s('lang', int(self.lang.currentIndex()))
+		s('lang', int(self.lang_cbb.currentIndex()))
 		upd_lang()
 		s('wnd_behavior', int(self.wnd_btns[1].isChecked()))
 		s('stay_on_top', int(self.sot_chk.isChecked()))
@@ -380,6 +424,15 @@ class SettingsWnd(QDialog):
 		s('antirep_num', int(self.antirep_numspn.value() if self.antirep_enabled else self.antirep_num))
 
 		s('data', self.name_table.get_value())
+
+		s('theme', int(self.theme_cbb.currentIndex()))
+		tmp_idx = self.theme_cbb.currentIndex()
+		if tmp_idx == 0:
+			QApplication.styleHints().setColorScheme(Qt.ColorScheme.Unknown)
+		elif tmp_idx == 1:
+			QApplication.styleHints().setColorScheme(Qt.ColorScheme.Light)
+		elif tmp_idx == 2:
+			QApplication.styleHints().setColorScheme(Qt.ColorScheme.Dark)
 
 		self.reload_lang()
 		self.name_table.reload_lang()

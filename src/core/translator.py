@@ -10,7 +10,7 @@ translation = {}
 def upd_lang():
 	global lang, translation
 	lang = int(l('lang', 0))
-	with open(p(LANG_MAP[lang] + '.json', True), 'r') as file:
+	with open(p(LANG_MAP[lang] + '.json', True), 'r', encoding='utf-8') as file:
 		translation = json.load(file)
 
 upd_lang()
