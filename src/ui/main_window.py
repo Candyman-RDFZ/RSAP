@@ -84,7 +84,7 @@ class RSAPMainWindow(QMainWindow):
 		self.name_label = QLineEdit()
 		self.name_label.setText('')
 		self.name_label.setReadOnly(True)
-		self.name_label.setStyleSheet('background: transparent; border: none;')
+		self.name_label.setStyleSheet('color: #1FA256; background: transparent; border: none;')
 		self.name_label.setAlignment(Qt.AlignmentFlag.AlignHCenter)
 		tmp_font = self.name_label.font()
 		tmp_font.setPointSize(self.height() // 6)

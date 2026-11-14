@@ -234,8 +234,10 @@ class SettingsWnd(QDialog):
 
 		self.theme_widget = QGroupBox(tr('stgwnd_theme'))
 		self.appr_layout.addWidget(self.theme_widget)
+		self.theme_layout_ = QVBoxLayout()
 		self.theme_layout = QHBoxLayout()
-		self.theme_widget.setLayout(self.theme_layout)
+		self.theme_layout_.addLayout(self.theme_layout)
+		self.theme_widget.setLayout(self.theme_layout_)
 
 		self.theme_lbl = QLabel(tr('stgwnd_seltheme'))
 		self.theme_layout.addWidget(self.theme_lbl)
@@ -244,7 +246,12 @@ class SettingsWnd(QDialog):
 		self.theme_cbb.addItems([tr('stgwnd_sysdef'), tr('stgwnd_light'), tr('stgwnd_dark')])
 		self.theme_cbb.setCurrentIndex(int(l('theme', 0)))
 		self.theme_layout.addWidget(self.theme_cbb)
+
 		self.theme_layout.addStretch()
+
+		self.theme_warn = QLabel(tr('stgwnd_themewarn'))
+		self.theme_warn.setWordWrap(True)
+		self.theme_layout_.addWidget(self.theme_warn)
 
 		self.lang_widget = QGroupBox(tr('stgwnd_lang'))
 		self.appr_layout.addWidget(self.lang_widget)
@@ -395,6 +402,7 @@ class SettingsWnd(QDialog):
 		self.theme_cbb.setItemText(0, tr('stgwnd_sysdef'))
 		self.theme_cbb.setItemText(1, tr('stgwnd_light'))
 		self.theme_cbb.setItemText(2, tr('stgwnd_dark'))
+		self.theme_warn.setText(tr('stgwnd_themewarn'))
 
 		self.lang_widget.setTitle(tr('stgwnd_lang'))
 		self.lang_lbl.setText(tr('stgwnd_sellang'))

@@ -47,6 +47,7 @@
 	"stgwnd_sysdef": "系統默認",
 	"stgwnd_light": "淺色",
 	"stgwnd_dark": "深色",
+	"stgwnd_themewarn": "<b>警告</b>：在包括 Windows 10 在內的某些平台上，對深色模式的支持有限。",
 	"stgwnd_lang": "語言",
 	"stgwnd_sellang": "選擇語言：",
 	"stgwnd_namewarn": "<b>警告</b>: 在返回“常規”選項卡進行進一步更改之前，請務必點擊底部的“應用”按鈕。",
