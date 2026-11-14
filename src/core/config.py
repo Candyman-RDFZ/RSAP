@@ -5,7 +5,7 @@ import platform
 
 NAME = 'RSAP'
 ORG = 'Candy_man'
-VERSION = '2.5a'
+VERSION = '2.6a'
 ID = 'io.github.Candyman-RDFZ.RSAP'
 
 PLATFORM = platform.system()
